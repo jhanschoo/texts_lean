@@ -4,7 +4,7 @@ namespace Dnf.C00.S02
 
 namespace Exercises
 
-#eval (fun a b => (Nat.gcd a b, Nat.xgcd a b)) 11391 5673
+#eval (fun a b ↦ (Nat.gcd a b, Nat.xgcd a b)) 11391 5673
 
 theorem ex1a : Nat.gcd 20 13 = 1 ∧ 1 = 2 * 20 + -3 * 13 := by simp
 theorem ex1b : Nat.gcd 69 372 = 3 ∧ 3 = 27 * 69 + -5 * 372 := by simp

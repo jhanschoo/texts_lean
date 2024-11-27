@@ -1,1 +1,3 @@
 # texts_lean
+
+Mathematical results following the mathematical development of several textbooks. Not much effort is devoted to following the same proof development; on the other hand, proofs relying on results already in Mathlib is frequently preferred. The objective is to showcase related results in Mathlib rather than to demonstrate proof techniques, though we might present the latter if whimsy strikes.

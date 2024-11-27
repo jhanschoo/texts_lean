@@ -4,6 +4,7 @@ namespace Dnf.C00.S01
 
 namespace Exercises
 
+section
 abbrev R2 := Fin 2 → ℝ
 
 abbrev 𝓐 := Matrix (Fin 2) (Fin 2) ℝ
@@ -80,6 +81,7 @@ theorem ex4 (p q r s : ℝ) : (r = 0 ∧ p + q = q + s) ↔ !![p, q; r, s] ∈ �
     have h01 := h 0 1
     simp at h01
     · rw [h01]
+end
 
 open Rat in
 theorem ex5_a : ¬ ∃ (f : ℚ → ℤ), ∀ (a b : ℤ), f (a /. b) = a := by
@@ -97,7 +99,7 @@ theorem ex5_a : ¬ ∃ (f : ℚ → ℤ), ∀ (a b : ℤ), f (a /. b) = a := by
 
 open Rat in
 theorem ex5_b : ∃ (f : ℚ → ℚ), ∀ (a b : ℤ), b ≠ 0 → f (a /. b) = a^2 /. b^2 := by
-  use λ p => p.num ^ 2 /. p.den ^ 2
+  use λ p ↦ p.num ^ 2 /. p.den ^ 2
   intro a b _
   simp [pow_succ, pow_zero]
   suffices h : (a /. b).num /. (a /. b).den = a /. b
@@ -111,16 +113,16 @@ theorem ex5_b : ∃ (f : ℚ → ℚ), ∀ (a b : ℤ), b ≠ 0 → f (a /. b) =
 /-
 The answer to exercise 6 depends on the ambiguous notion of "decimal expansion". It is known that numbers representable as a fraction of integers where the denominator is a power of 10 has two decimal expansions, in the less precise sense of the term; one has finitely many non-zeros, the other has finitely many non-nines; we formalize this notion below.
 -/
-noncomputable def g (f : ℕ → ℝ) : ℕ → ℝ := λ n => (f n / 10 ^ n)
-def f1' : ℕ → Fin 10 := λ n =>
+noncomputable def g (f : ℕ → ℝ) : ℕ → ℝ := λ n ↦ (f n / 10 ^ n)
+def f1' : ℕ → Fin 10 := λ n ↦
   if n = 0 then 1
   else 0
 
-def f2' : ℕ → Fin 10 := λ n =>
+def f2' : ℕ → Fin 10 := λ n ↦
   if n = 0 then 0
   else 9
 
-def into_sequence (f : ℕ → Fin 10) : ℕ → ℚ := λ n => (f n) / 10 ^ n
+def into_sequence (f : ℕ → Fin 10) : ℕ → ℚ := λ n ↦ (f n) / 10 ^ n
 
 def f1 := into_sequence f1'
 def f2 := into_sequence f2'
@@ -146,8 +148,8 @@ theorem f1_to_1 : HasSum f1 1 := by
     simp
 
 theorem f2_to_1 : HasSum f2 1 := by
-  set g := fun (n : ℕ) => if n = 0 then 0 else ((1:ℚ)/10) ^ n
-  set g' := fun (n : ℕ) => ((1:ℚ)/10) ^ n
+  set g := fun (n : ℕ) ↦ if n = 0 then 0 else ((1:ℚ)/10) ^ n
+  set g' := fun (n : ℕ) ↦ ((1:ℚ)/10) ^ n
   have : ‖(1 : ℚ) / 10‖ < 1 := by
     rw [← Rat.norm_cast_real, Real.norm_eq_abs]
     norm_cast
@@ -162,7 +164,7 @@ theorem f2_to_1 : HasSum f2 1 := by
     have := HasSum.update hSg' 0 0
     ring_nf at this
     rwa [hgg']
-  have hf2g : f2 = fun (i : ℕ) => 9 * g i := by
+  have hf2g : f2 = fun (i : ℕ) ↦ 9 * g i := by
     funext n
     cases n <;> simp [f2, into_sequence, f2', g]
     norm_cast
@@ -180,7 +182,7 @@ variable {A B : Type*}
 
 variable (f : A → B)
 
-def rel := fun a b => f a = f b
+def rel := fun a b ↦ f a = f b
 
 theorem rel_f : Equivalence (rel f) := by
   unfold rel
@@ -207,8 +209,7 @@ theorem fibers_f (hSurj : Function.Surjective f) : { S : Set A | ∃ a, S = {b |
 
 theorem ex7 (hSurj : Function.Surjective f) : Equivalence (rel f) ∧ { S : Set A | ∃ a, S = {b | rel f a b} } = { S : Set A | ∃ b, S = f⁻¹' {b}} :=
   ⟨rel_f f, fibers_f f hSurj⟩
+
 end
-
 end Exercises
-
 end Dnf.C00.S01
