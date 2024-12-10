@@ -6,23 +6,32 @@ namespace Exercises
 
 #eval (fun a b ↦ (Nat.gcd a b, Nat.xgcd a b)) 11391 5673
 
-theorem ex1a : Nat.gcd 20 13 = 1 ∧ 1 = 2 * 20 + -3 * 13 := by simp
-theorem ex1b : Nat.gcd 69 372 = 3 ∧ 3 = 27 * 69 + -5 * 372 := by simp
-theorem ex1c : Nat.gcd 792 275 = 11 ∧ 11 = 8 * 792 + -23 * 275 := by simp
-theorem ex1d : Nat.gcd 11391 5673 = 3 ∧ 3 = -126 * 11391 + 253 * 5673 := by simp
-theorem ex1e : Nat.gcd 1761 1567 = 1 ∧ 1 = -105 * 1761 + 118 * 1567 := by simp
-theorem ex1f : Nat.gcd 507885 60808 = 691 ∧ 691 = -17 * 507885 + 142 * 60808 := by simp
+/- Exercise 0.2.1.(a) -/
+example : Nat.gcd 20 13 = 1 ∧ 1 = 2 * 20 + -3 * 13 := by simp
+/- Exercise 0.2.1.(b) -/
+example : Nat.gcd 69 372 = 3 ∧ 3 = 27 * 69 + -5 * 372 := by simp
+/- Exercise 0.2.1.(c) -/
+example : Nat.gcd 792 275 = 11 ∧ 11 = 8 * 792 + -23 * 275 := by simp
+/- Exercise 0.2.1.(d) -/
+example : Nat.gcd 11391 5673 = 3 ∧ 3 = -126 * 11391 + 253 * 5673 := by simp
+/- Exercise 0.2.1.(e) -/
+example : Nat.gcd 1761 1567 = 1 ∧ 1 = -105 * 1761 + 118 * 1567 := by simp
+/- Exercise 0.2.1.(f) -/
+example : Nat.gcd 507885 60808 = 691 ∧ 691 = -17 * 507885 + 142 * 60808 := by simp
 
-theorem ex2 (k a b s t : ℤ) (hka : k ∣ a) (hkb : k ∣ b) : k ∣ s * a + t * b := by
+/- Exercise 0.2.2 -/
+example (k a b s t : ℤ) (hka : k ∣ a) (hkb : k ∣ b) : k ∣ s * a + t * b := by
   apply dvd_add
   · exact Dvd.dvd.mul_left hka s
   · exact Dvd.dvd.mul_left hkb t
 
-theorem ex3 (n : ℕ) (hnP : ¬Prime n) (hn0 : n ≠ 0) (hn1 : n ≠ 1) : ∃ a b, n ∣ a * b ∧ ¬(n ∣ a) ∧ ¬(n ∣ b) := by
+/- Exercise 0.2.3 -/
+example (n : ℕ) (hnP : ¬Prime n) (hn0 : n ≠ 0) (hn1 : n ≠ 1) : ∃ a b, n ∣ a * b ∧ ¬(n ∣ a) ∧ ¬(n ∣ b) := by
   simp [Prime] at hnP
   exact hnP hn0 hn1
 
-theorem ex4 (a b N d x₀ y₀ x y t : ℤ) (ha0 : a ≠ 0) (_hb0 : b ≠ 0) (hd : d = gcd a b) (hN : a * x₀ + b * y₀ = N) (hxt : x = x₀ + b / d * t) (hyt : y = y₀ - a / d * t) : a * x + b * y = N := by
+/- Exercise 0.2.4 -/
+example (a b N d x₀ y₀ x y t : ℤ) (ha0 : a ≠ 0) (_hb0 : b ≠ 0) (hd : d = gcd a b) (hN : a * x₀ + b * y₀ = N) (hxt : x = x₀ + b / d * t) (hyt : y = y₀ - a / d * t) : a * x + b * y = N := by
   subst hd hxt hyt hN
   have hdvda : gcd a b ∣ a := gcd_dvd_left a b
   have hdvdb : gcd a b ∣ b := gcd_dvd_right a b
@@ -46,6 +55,7 @@ theorem ex4 (a b N d x₀ y₀ x y t : ℤ) (ha0 : a ≠ 0) (_hb0 : b ≠ 0) (hd
   rw [ht₁', ht₂']
   ring
 
+/- Exercise 0.2.5 -/
 theorem t0 : Nat.totient 0 = 0 := Nat.totient_zero
 theorem t1 : Nat.totient 1 = 1 := Nat.totient_one
 theorem t2 : Nat.totient 2 = 1 := Nat.totient_prime (by norm_num)

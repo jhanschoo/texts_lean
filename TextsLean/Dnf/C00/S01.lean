@@ -5,69 +5,66 @@ namespace Dnf.C00.S01
 namespace Exercises
 
 section
-abbrev R2 := Fin 2 → ℝ
 
-abbrev 𝓐 := Matrix (Fin 2) (Fin 2) ℝ
+abbrev R22 := Matrix (Fin 2) (Fin 2) ℝ
+def M : R22 := !![1, 1; 0, 1]
+def B := {A : R22 | M * A = A * M }
 
-def M : 𝓐 := !![1, 1; 0, 1]
+/- Exercise 0.1.1.1 -/
+example : !![1, 1; 0, 1] ∈ B := by
+  simp [B, M]
 
-def 𝓑 := {A : 𝓐 | M * A = A * M }
-
-theorem ex1_1 : !![1, 1; 0, 1] ∈ 𝓑 := by
-  simp [𝓑, M]
-
-theorem ex1_2 : !![1, 1; 1, 1] ∉ 𝓑 := by
-  simp [𝓑, M]
+/- Exercise 0.1.1.2 -/
+example : !![1, 1; 1, 1] ∉ B := by
+  simp [B, M]
   intro h
   rw [← Matrix.ext_iff] at h
   simp at h
   have h1 := h 1 1
   simp at h1
 
-theorem ex1_3 : !![0, 0; 0, 0] ∈ 𝓑 := by
-  simp [𝓑, M]
+/- Exercise 0.1.1.3 -/
+example : !![0, 0; 0, 0] ∈ B := by
+  simp [B, M]
   rw [← Matrix.ext_iff]
   intro i j
-  fin_cases i, j
-  all_goals
-    simp
+  fin_cases i, j <;> simp
 
-theorem ex1_4 : !![1, 1; 1, 1] ∉ 𝓑 := by
-  simp [𝓑, M]
+/- Exercise 0.1.1.4 -/
+example : !![1, 1; 1, 1] ∉ B := by
+  simp [B, M]
   intro h
   rw [← Matrix.ext_iff] at h
   simp at h
   have h1 := h 1 1
   simp at h1
 
-theorem ex1_5 : !![1, 0; 0, 1] ∈ 𝓑 := by
-  simp [𝓑, M]
+/- Exercise 0.1.1.5 -/
+example : !![1, 0; 0, 1] ∈ B := by
+  simp [B, M]
 
-theorem ex1_6 : !![0, 1; 1, 0] ∉ 𝓑 := by
-  simp [𝓑, M]
+/- Exercise 0.1.1.6 -/
+example : !![0, 1; 1, 0] ∉ B := by
+  simp [B, M]
   intro h
   rw [← Matrix.ext_iff] at h
   simp at h
   have h1 := h 1 1
   simp at h1
 
-theorem ex2 : ∀ P ∈ 𝓑, ∀ Q ∈ 𝓑, P + Q ∈ 𝓑 := by
-  intros P hP Q hQ
-  simp only [𝓑, Set.mem_setOf_eq, M] at *
+/- Exercise 0.1.2 -/
+example (P Q : R22) (hP : P ∈ B) (hQ : Q ∈ B) : P + Q ∈ B := by
+  simp only [B, Set.mem_setOf_eq, M] at *
   rw [mul_add, add_mul, hP, hQ]
 
-theorem ex3 : ∀ P ∈ 𝓑, ∀ Q ∈ 𝓑, P * Q ∈ 𝓑 := by
-  intros P hP Q hQ
-  simp only [𝓑, Set.mem_setOf_eq, M] at *
+/- Exercise 0.1.3 -/
+example (P Q : R22) (hP : P ∈ B) (hQ : Q ∈ B) : P * Q ∈ B := by
+  simp only [B, Set.mem_setOf_eq, M] at *
   rw [← mul_assoc, hP, mul_assoc, hQ, ← mul_assoc]
 
--- theorem ex4 (p q r s : ℝ) : !![p, q; r, s] ∈ 𝓑 := by
---   rw [𝓑, M, Set.mem_setOf_eq, ← Matrix.ext_iff]
---   intro i j
---   fin_cases i, j <;> simp
-
-theorem ex4 (p q r s : ℝ) : (r = 0 ∧ p + q = q + s) ↔ !![p, q; r, s] ∈ 𝓑 := by
-  rw [𝓑, M, Set.mem_setOf_eq, ← Matrix.ext_iff]
+/- Exercise 0.1.4 -/
+example (p q r s : ℝ) : (r = 0 ∧ p + q = q + s) ↔ !![p, q; r, s] ∈ B := by
+  rw [B, M, Set.mem_setOf_eq, ← Matrix.ext_iff]
   constructor
   · intro ⟨hr, h⟩
     subst hr
@@ -83,46 +80,48 @@ theorem ex4 (p q r s : ℝ) : (r = 0 ∧ p + q = q + s) ↔ !![p, q; r, s] ∈ �
     · rw [h01]
 end
 
+/- Exercise 0.1.5.(a) -/
 open Rat in
-theorem ex5_a : ¬ ∃ (f : ℚ → ℤ), ∀ (a b : ℤ), f (a /. b) = a := by
-  push_neg
-  intro f
-  have : Decidable (f (4 /. 2) = 4) := by infer_instance
-  cases this with
-  | isTrue h1 =>
-    use 2, 1
-    have h : 2 /. 1 = 4 /. 2 := by rfl
-    rw [h, h1]
-    simp
-  | isFalse h1 =>
-    use 4, 2
+example (f : ℚ → ℤ) (hf : ∀ a b, f (a /. b) = a) : False := by
+  by_cases h : f (4 /. 2) = 4
+  · have h1 : 2 /. 1 = 4 /. 2 := by rfl
+    rw [← h1, hf] at h
+    norm_num at h
+  · apply h
+    rw [hf]
 
+/- Exercise 0.1.5.(b) -/
 open Rat in
-theorem ex5_b : ∃ (f : ℚ → ℚ), ∀ (a b : ℤ), b ≠ 0 → f (a /. b) = a^2 /. b^2 := by
-  use λ p ↦ p.num ^ 2 /. p.den ^ 2
-  intro a b _
-  simp [pow_succ, pow_zero]
-  suffices h : (a /. b).num /. (a /. b).den = a /. b
-  · simp only [divInt_eq_div, Int.cast_mul] at *
-    have h1 : ∀ (p q : ℚ), p * p / (q * q) = (p / q) * (p / q) := by
-      intros p q
-      ring
-    rw [h1, h1, h]
-  · simp
+theorem ex5_b : ∃! (f : ℚ → ℚ), ∀ (a b : ℤ), f (a /. b) = a^2 /. b^2 := by
+  use fun p ↦ p.num ^ 2 /. p.den ^ 2
+  constructor
+  · simp; intro a b
+    simp [pow_succ, pow_zero]
+    suffices h : (a /. b).num /. (a /. b).den = a /. b
+    · simp only [divInt_eq_div, Int.cast_mul] at *
+      have h1 : ∀ (p q : ℚ), p * p / (q * q) = (p / q) * (p / q) := by
+        intros p q
+        ring
+      rw [h1, h1, h]
+    · simp
+  · simp; intro f' hf'
+    ext p
+    nth_rw 1 [← Rat.divInt_self p]
+    rw [hf']
 
 /-
 The answer to exercise 6 depends on the ambiguous notion of "decimal expansion". It is known that numbers representable as a fraction of integers where the denominator is a power of 10 has two decimal expansions, in the less precise sense of the term; one has finitely many non-zeros, the other has finitely many non-nines; we formalize this notion below.
 -/
-noncomputable def g (f : ℕ → ℝ) : ℕ → ℝ := λ n ↦ (f n / 10 ^ n)
-def f1' : ℕ → Fin 10 := λ n ↦
+noncomputable def g (f : ℕ → ℝ) : ℕ → ℝ := fun n ↦ (f n / 10 ^ n)
+def f1' : ℕ → Fin 10 := fun n ↦
   if n = 0 then 1
   else 0
 
-def f2' : ℕ → Fin 10 := λ n ↦
+def f2' : ℕ → Fin 10 := fun n ↦
   if n = 0 then 0
   else 9
 
-def into_sequence (f : ℕ → Fin 10) : ℕ → ℚ := λ n ↦ (f n) / 10 ^ n
+def into_sequence (f : ℕ → Fin 10) : ℕ → ℚ := fun n ↦ (f n) / 10 ^ n
 
 def f1 := into_sequence f1'
 def f2 := into_sequence f2'

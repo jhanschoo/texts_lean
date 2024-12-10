@@ -91,15 +91,36 @@ theorem Z_L (n : ℕ) : Z n + 2 * n = L (2 * n) := by
 ## The Josephus problem
 -/
 
-def J : ℕ → ℕ
-  | 0 => 0
-  | n'+1 =>
-    let n := n' + 1
-    match n % 2 with
-    | 0 =>
-      2 * J (n / 2) - 1
-    | _ =>
-      2 * J (n / 2) + 1
+/- See: definition of Nat.log2 -/
+theorem J_terminates : ∀ n, n ≠ 0 -> n / 2 < n
+  | 0, h => by contradiction
+  | 1, _ => by decide
+  | 2, _ => by decide
+  | 3, _ => by decide
+  | n+4, _ => by
+    rw [Nat.div_eq, if_pos]
+    refine Nat.succ_lt_succ (Nat.lt_trans ?_ (Nat.lt_succ_self _))
+    exact J_terminates (n+2) (by simp)
+    simp
+
+def J (n : ℕ) : ℤ :=
+  if n = 0 then 0 else
+  match n % 2 with
+  | 0 =>
+    2 * J (n / 2) - 1
+  | _ =>
+    2 * J (n / 2) + 1
+  decreasing_by rename n ≠ 0 => h; exact J_terminates _ h
+
+-- def J : ℕ → ℕ
+--   | 0 => 0
+--   | n'+1 =>
+--     let n := n' + 1
+--     match n % 2 with
+--     | 0 =>
+--       2 * J (n / 2) - 1
+--     | _ =>
+--       2 * J (n / 2) + 1
 
 theorem J_closed (m : ℕ) : ∀ l < 2 ^ m, J (2 ^ m + l) = 2 * l + 1 := by
   intro l hl
@@ -114,15 +135,13 @@ theorem J_closed (m : ℕ) : ∀ l < 2 ^ m, J (2 ^ m + l) = 2 * l + 1 := by
   unfold J
   split
   · -- n = 0 ⇒ l < 0, contradiction
-    case h_1 heq => linarith
-  · case h_2 n' heq =>
-    dsimp at *
+    linarith
+  split
+  · case h_1 hne0 n' heq =>
     /- special case: m = 0 -/
     cases m <;> simp at *
     · subst hl
       simp at *
-      subst n'
-      simp [J]
     case succ m' =>
     have hlmod : (2 ^ (m' + 1) + l) % 2 = l % 2 := calc
       (2 ^ (m' + 1) + l) % 2 = (2 * 2 ^ m' + l) % 2 := by rw [Nat.pow_succ, Nat.mul_comm]
