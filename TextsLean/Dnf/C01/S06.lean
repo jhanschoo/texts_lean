@@ -2,22 +2,19 @@ import TextsLean.Basic
 
 namespace Dnf.C01.S06
 
-/- Definition 1.6.1 Homomorphism -/
+/- Definition 1.6.1 **homomorphism** -/
 #check MonoidHom
 #check AddMonoidHom
 
-variable [Group G] [Group H]
-variable [AddGroup A] [AddGroup B]
+example [Group G] [Group H] (φ : G →* H) (x y : G) : φ (x * y) = φ x * φ y := φ.map_mul x y
+example [AddGroup A] [AddGroup B] (σ : A →+ B) (a b : A) : σ (a + b) = σ a + σ b := σ.map_add a b
 
-example (φ : G →* H) (x y : G) : φ (x * y) = φ x * φ y := φ.map_mul x y
-example (σ : A →+ B) (a b : A) : σ (a + b) = σ a + σ b := σ.map_add a b
-
+/- Definition 1.6.2 **isomorphism** -/
 #check MulEquiv
 #check AddEquiv
 
-/- Definition 1.6.2 Isomorphism -/
 section
-variable (ρ : G ≃* H) (τ : A ≃+ B)
+variable [Group G] [Group H] [AddGroup A] [AddGroup B] (ρ : G ≃* H) (τ : A ≃+ B)
 
 #check ρ.toMonoidHom
 #check ρ.left_inv
@@ -27,30 +24,33 @@ variable (ρ : G ≃* H) (τ : A ≃+ B)
 #check τ.right_inv
 end
 
-/- Examples 1.6.3.1 -/
-example : G ≃* G := MulEquiv.refl G
-#synth Inhabited (G ≃* G)
-/- Examples 1.6.3.2 -/
+/- Examples 1.6.1.(1) **isomorphism classes** -/
+example [Group G] : G ≃* G := MulEquiv.refl G
+
+/- Examples 1.6.1.(2) -/
 #check Real.expMonoidHom
 noncomputable example : MonoidHom (Multiplicative ℝ) ℝ :=
   { toFun := fun x => Real.exp x.toAdd,
     map_one' := by simp,
     map_mul' := by simp [Real.exp_add] }
 /- TODO show that image is ℝ+ -/
-/- Examples 1.6.3.3 -/
+
+/- Examples 1.6.1.3 -/
 -- Equiv.permCongr defines the bijection between the symmetric groups, but falls short of showing that it is a group isomorphism (even though it is, in the way that it is defined).
-instance {α' β' : Type*} (e : α' ≃ β') : Equiv.Perm α' ≃ Equiv.Perm β' :=
+instance (e : α ≃ β) : Equiv.Perm α ≃ Equiv.Perm β :=
   {
     toFun := Equiv.permCongr e,
     invFun := Equiv.permCongr e.symm,
     left_inv := by intro; ext; simp,
     right_inv := by intro; ext; simp
   }
+-- TODO
+
 
 namespace Exercises
 
 /- Exercise 1.6.1.(a) -/
-example (φ : G →* H) (x : G) (n : ℕ) : φ (x ^ n) = φ x ^ n := by
+example [Group α] [Group β] (φ : α →* β) (x : α) (n : ℕ) : φ (x ^ n) = φ x ^ n := by
   induction n
   case zero => simp
   case succ n ih =>
@@ -59,25 +59,26 @@ example (φ : G →* H) (x : G) (n : ℕ) : φ (x ^ n) = φ x ^ n := by
       _ = φ (x ^ n) * φ x := by rw [φ.map_mul]
       _ = φ x ^ n * φ x := by rw [ih]
       _ = φ x ^ n.succ := by rw [pow_succ]
-example (φ : G →* H) (x : G) (n : ℕ) : φ (x ^ n) = φ x ^ n := MonoidHom.map_pow φ x n
+example [Group α] [Group β] (φ : α →* β) (x : α) (n : ℕ) : φ (x ^ n) = φ x ^ n := MonoidHom.map_pow φ x n
 /- Exercise 1.6.1.(b) -/
-example (φ : G →* H) (x : G) (n : ℤ) : φ (x ^ n) = φ x ^ n := MonoidHom.map_zpow φ x n
+example [Group α] [Group β] (φ : α →* β) (x : α) (n : ℤ) : φ (x ^ n) = φ x ^ n := MonoidHom.map_zpow φ x n
 -- the proof is located here, and is in respect to a more general context:
 #check map_zpow'
 
 /- Exercise 1.6.2 -/
-example (e : G ≃* H) (x : G) : orderOf (e x) = orderOf x := orderOf_injective e.toMonoidHom e.injective x
-example (e : G ≃* H) (x : G) : orderOf (e x) = orderOf x := MulEquiv.orderOf_eq e x
-example (e : A ≃+ B) (x : A) : addOrderOf (e x) = addOrderOf x := AddEquiv.addOrderOf_eq e x
+example [Group α] [Group β] (e : α ≃* β) (x : α) : orderOf (e x) = orderOf x := orderOf_injective e.toMonoidHom e.injective x
+#check MulEquiv.orderOf_eq
+#check AddEquiv.addOrderOf_eq
 /- The result holds whenever φ is injective. -/
 #check orderOf_injective
 #check addOrderOf_injective
 /- Otherwise, the following counterexample exists. -/
 example (f : ZMod 2 →+ Unit) : f 1 = () ∧ addOrderOf (1 : ZMod 2) = 2 ∧ addOrderOf (() : Unit) = 1 := by simp only [ZMod.addOrderOf_one,
   AddMonoid.addOrderOf_eq_one_iff, PUnit.zero_eq, and_self]
+example (f : ZMod 2 →+ Unit) (x : ZMod 2) (hord : addOrderOf (f x) = addOrderOf x) : False := by sorry
 
 /- Exercise 1.6.3 -/
-example {G' : Type*} [CommGroup G'] (e : G' ≃* H) (x y : H) : x * y = y * x :=
+example [CommGroup α] [Mul β] (e : α ≃* β) (x y : β) : x * y = y * x :=
   calc
     x * y = e (e.symm x * e.symm y) := by simp
     _ = e (e.symm y * e.symm x) := by rw [mul_comm _ _]
@@ -89,7 +90,7 @@ example {G' : Type*} [CommGroup G'] (e : G' ≃* H) (x y : H) : x * y = y * x :=
 #check Equiv.addCommGroup
 /- Sufficient conditions: (note that notion of subgroup may be defined in terms of this property); some abelian quotient Q of G exists such that Q ->* H exists. Stricter sufficient condition: G/C ->* H exists, where C is the commutator subgroup of G -/
 
-/- Exercise 1.6.3 -/
+/- Exercise 1.6.4 -/
 example (eqv : ℝˣ ≃* ℂˣ) : False := by
   have f := eqv.symm.toMonoidHom
   -- set I := Units.mk0 Complex.I Complex.I_ne_zero with hI
@@ -163,11 +164,9 @@ example (eqv : ℝˣ ≃* ℂˣ) : False := by
   rw [hcontra] at this
   tauto
 
-/- Exercise 1.6.4 -/
+/- Exercise 1.6.5 -/
 example (e : ℝˣ ≃* ℂˣ) : False := by sorry
 
-/- Exercise 1.6.5 -/
-example (e : ℝ ≃+ ℚ) : False := by sorry
 /- Exercise 1.6.6 -/
 example (e : ℤ ≃+ ℚ) : False := by sorry
 /- Exercise 1.6.7 -/
@@ -193,10 +192,10 @@ example (e : α ≃ β) : Equiv.Perm α ≃* Equiv.Perm β := by
 end Exercises
 
 /- Exercise 1.6.11 -/
-example : G × H ≃* H × G := by sorry
+example [Group α] [Group β] : α × β ≃* β × α := by sorry
 
 /- Exercise 1.6.12 -/
-example [Group F] : (F × G) × H ≃* F × G × H := by sorry
+example [Group α] [Group β] [Group γ] : (α × β) × γ ≃* α × β × γ := by sorry
 
 /- Exercise 1.6.13 -/
 -- TODO
@@ -206,25 +205,31 @@ example [Group F] : (F × G) × H ≃* F × G × H := by sorry
 #check MonoidHom.ker
 
 /- Exercise 1.6.15 -/
-example : ℝ × ℝ →+ ℝ := {
+namespace Ex_1_6_15
+def fst : ℝ × ℝ →+ ℝ := {
   toFun := Prod.fst,
   map_zero' := by simp,
   map_add' := by simp
 }
+example : fst.ker = { (x, y) : ℝ × ℝ | x = 0 } := by sorry
+end Ex_1_6_15
 
 /- Exercise 1.6.16 -/
-def fst [Group G] [Group H] : G × H →* G := {
+namespace Ex_1_6_16
+variable [Group G] [Group H]
+def fst : G × H →* G := {
   toFun := Prod.fst,
   map_one' := by simp,
   map_mul' := by simp
 }
-#check (fst : G × H →* _).ker
-def snd : G × H →* H := {
+example : (@fst G H _ _).ker = { (x, y) : G × H | g = 1 } := by sorry
+def snd [Group G] [Group H] : G × H →* H := {
   toFun := Prod.snd,
   map_one' := by simp,
   map_mul' := by simp
 }
-#check (snd : G × H →* _).ker
+example : (@snd G H _ _).ker = { (x, y) : G × H | h = 1 } := by sorry
+end Ex_1_6_16
 
 /- Exercise 1.6.17 -/
 example [hG : Group G] : (∃ (φ : G →* G), (φ : G → G) = (· ⁻¹)) ↔ ∃ (e : CommGroup G), e.toGroup = hG := by sorry
@@ -232,7 +237,5 @@ example [hG : Group G] : (∃ (φ : G →* G), (φ : G → G) = (· ⁻¹)) ↔ 
 /- Exercise 1.6.18 -/
 example [hG : Group G] : (∃ (φ : G →* G), (φ : G → G) = (· ^ 2)) ↔ ∃ (e : CommGroup G), e.toGroup = hG := by sorry
 
-/- Exercise 1.6.18 -/
-example [hG : Group G] : (∃ (φ : G →* G), (φ : G → G) = (· ^ 2)) ↔ ∃ (e : CommGroup G), e.toGroup = hG := by sorry
 
 end Dnf.C01.S06

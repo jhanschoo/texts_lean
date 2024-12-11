@@ -2,19 +2,21 @@ import TextsLean.Basic
 
 namespace Dnf.C01.S03
 
-variable (α : Type*) (n : ℕ)
+/- Definition 1.3.1 **symmetric group**, **permutations** -/
 #check Equiv.Perm.permGroup
 abbrev S := Equiv.Perm
 
-#check fun (σ τ : S α) ↦ σ * τ
-example (a : α) : (1 : S α) a = a := rfl
+#check fun {α : Type*} (σ τ : S α) ↦ σ * τ
+example {α : Type*} (a : α) : (1 : S α) a = a := rfl
 example (σ : S α) : σ * σ⁻¹ = 1 := by rw [mul_inv_eq_one]
 example (σ : S α) : σ⁻¹ * σ = 1 := by rw [inv_mul_eq_one]
 
-abbrev Sn := Equiv.Perm (Fin n)
-#check Sn
+/- Definition 1.3.2 **symmetric group** of degree n -/
+abbrev Sn n := Equiv.Perm (Fin n)
 
 example : Fintype.card (Sn n) = Nat.factorial n := by rw [Fintype.card_perm, Fintype.card_fin]
+
+/- Definition 1.3.3 **cycle** -/
 
 #check (c[0, 11, 7, 9, 3] * c[1, 12] * c[2] * c[4, 10, 6] * c[5, 8] : Sn 13)
 example : (c[0, 11, 7, 9, 3] * c[1, 12] * c[2] * c[4, 10, 6] * c[5, 8] : Sn 13)⁻¹ = c[8, 5] * c[6, 10, 4] * c[2] * c[12, 1] * c[3, 9, 7, 11, 0] := by
@@ -29,7 +31,12 @@ example : c[0, 1] * c[0, 2] = c[0, 2, 1] := by
     repeat (rw [Equiv.swap_apply_of_ne_of_ne] <;> try linarith)
 
 /- The cyclic factors of a permutation are disjoint and commute -/
+/- Definition 1.3.4 **cycle decomposition** -/
 #check Equiv.Perm.cycleFactorsFinset
+
+/- Definition 1.3.5 **length**, or **order** of a cycle. **disjoint** cycles -/
+
+/- TODO: statement that a permutation's cycle decomposition is unique -/
 
 namespace Exercises
 

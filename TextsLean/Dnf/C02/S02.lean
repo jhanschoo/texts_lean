@@ -2,8 +2,7 @@ import TextsLean.Basic
 
 namespace Dnf.C02.S02
 
-/- Definition 2.2.1 -/
-#check Subgroup.center
+/- Definition 2.2.1 **centralizer** -/
 #check Subgroup.centralizer
 example [Group α] (A : Set α) : Subgroup.centralizer A = { g : α | ∀ a ∈ A, g * a * g⁻¹ = a } := by
   simp only [Subgroup.centralizer, Set.centralizer, Subgroup.coe_set_mk]
@@ -14,6 +13,10 @@ example [Group α] (A : Set α) : Subgroup.centralizer A = { g : α | ∀ a ∈ 
     rw [← @mul_right_cancel_iff _ _ _ g _ _, eq_comm]
     simp
 
+/- Definition 2.2.2 **center** -/
+#check Subgroup.center
+
+/- Definition 2.2.3 **normalizer** -/
 #check Subgroup.normalizer
 #check Subgroup.setNormalizer
 
@@ -30,9 +33,17 @@ example [Group α] (A : Set α) : Subgroup.centralizer A ≤ Subgroup.setNormali
     simp at hgh
     rwa [hgh]
 
+/- Example 2.2.1 TODO  -/
+
+/- Definition 2.2.4 **stabilizer** -/
 #check MulAction.stabilizer
 #check AddAction.stabilizer
 
+-- TODO proof that the kernel of an action is a subgroup
+
+/- Example 2.2.2 TODO -/
+
+-- TODO
 #check Subgroup.centralizer_eq_comap_stabilizer
 
 namespace Exercises

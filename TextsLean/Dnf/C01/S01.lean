@@ -3,24 +3,25 @@ import TextsLean.Basic
 namespace Dnf.C01.S01
 
 /- Definition 1.1.1.(1) **binary operation** -/
-#check (α : Type*) → (α → α → α)
+#check {α : Type*} → (α → α → α)
 /- Definition 1.1.1.(2) **associative** -/
 #check Std.Associative
 /- Definition 1.1.1.(3) **commutative** -/
 #check Std.Commutative
 
-/- Example 1.1.2.(1) -/
+/- Example 1.1.1.(1) -/
 #synth (Std.Commutative (· + · : ℤ → ℤ → ℤ))
 #synth (Std.Commutative (· + · : ℚ → ℚ → ℚ))
 #synth (Std.Commutative (· + · : ℝ → ℝ → ℝ))
 #synth (Std.Commutative (· + · : ℂ → ℂ → ℂ))
-/- Example 1.1.2.(2) -/
+
+/- Example 1.1.1.(2) -/
 #synth (Std.Commutative (· * · : ℤ → ℤ → ℤ))
 #synth (Std.Commutative (· * · : ℚ → ℚ → ℚ))
 #synth (Std.Commutative (· * · : ℝ → ℝ → ℝ))
 #synth (Std.Commutative (· * · : ℂ → ℂ → ℂ))
 
-/- Example 1.1.2.(3) -/
+/- Example 1.1.1.(3) -/
 #check (· - · : ℤ → ℤ → ℤ)
 example : ¬Std.Commutative (· - · : ℤ → ℤ → ℤ) := by
   intro contra
@@ -30,7 +31,7 @@ example : ¬Std.Commutative (· - · : ℤ → ℤ → ℤ) := by
   use 0, 1
   norm_num
 
-/- Example 1.1.2.(4) -/
+/- Example 1.1.1.(4) -/
 example : ¬∀ (a b : ℤ), a > 0 → b > 0 → a - b > 0 := by
   push_neg
   use 1, 1
@@ -44,7 +45,7 @@ example : ¬∀ (a b : ℝ), a > 0 → b > 0 → a - b > 0 := by
   use 1, 1
   norm_num
 
-/- Example 1.1.2.(5) -/
+/- Example 1.1.1.(5) -/
 section
 open Matrix
 example : ¬Std.Associative ((·: (Fin 3 → ℝ)) ×₃ ·) := by
@@ -77,10 +78,10 @@ end
 
 /- Definition of **closure** -/
 
-/- Definition 1.1.3.(1) **group** -/
+/- Definition 1.1.2.(1) **group** -/
 #check Group
 #check AddGroup
-class DnfGroup (α : Type* ) extends One α, Mul α, Inv α where
+class DnfGroup (α : Type*) extends One α, Mul α, Inv α where
   mul_assoc : ∀ a b c : α, a * b * c = a * (b * c)
   one_mul : ∀ a : α, 1 * a = a
   mul_one : ∀ a : α, a * 1 = a
@@ -88,7 +89,7 @@ class DnfGroup (α : Type* ) extends One α, Mul α, Inv α where
   inv_mul : ∀ a : α, a⁻¹ * a = 1
 /- Lean defines a notion of a group with an element outside the invertibility structure added to it. -/
 #check GroupWithZero
-class DnfGroupWithZero (α : Type* ) extends Zero α, One α, Mul α, Inv α where
+class DnfGroupWithZero (α : Type*) extends Zero α, One α, Mul α, Inv α where
   mul_assoc : ∀ a b c : α, a * b * c = a * (b * c)
   one_mul : ∀ a : α, 1 * a = a
   mul_one : ∀ a : α, a * 1 = a
@@ -97,7 +98,7 @@ class DnfGroupWithZero (α : Type* ) extends Zero α, One α, Mul α, Inv α whe
   mul_inv_cancel : ∀ a : α, a ≠ 0 → a * a⁻¹ = 1
   inv_mul_cancel : ∀ a : α, a ≠ 0 → a⁻¹ * a = 1
 
-/- Definition 1.1.3.(2) **abelian group** -/
+/- Definition 1.1.2.(2) **abelian group** -/
 #check CommGroup
 #check AddCommGroup
 class DnfCommGroup (α : Type* ) extends DnfGroup α where
@@ -106,9 +107,9 @@ class DnfCommGroup (α : Type* ) extends DnfGroup α where
 class DnfCommGroupWithZero (α : Type* ) extends DnfGroupWithZero α where
   mul_comm : ∀ a b : α, a * b = b * a
 
-/- Example 1.1.4.(1) -/
+/- Example 1.1.2.(1) -/
 #synth AddCommGroup ℤ
-instance : DnfGroup ℤ where
+example : DnfGroup ℤ where
   mul := (· + · : ℤ → ℤ → ℤ)
   one := (0 : ℤ)
   inv := (- · : ℤ → ℤ)
@@ -119,7 +120,7 @@ instance : DnfGroup ℤ where
   inv_mul := Int.add_left_neg
 
 #synth AddCommGroup ℚ
-instance : DnfGroup ℚ where
+example : DnfGroup ℚ where
   mul := (· + · : ℚ → ℚ → ℚ)
   one := (0 : ℚ)
   inv := (- · : ℚ → ℚ)
@@ -130,7 +131,7 @@ instance : DnfGroup ℚ where
   mul_inv := add_neg_cancel
 
 #synth AddCommGroup ℝ
-instance : DnfGroup ℝ where
+example : DnfGroup ℝ where
   mul := (· + · : ℝ → ℝ → ℝ)
   one := (0 : ℝ)
   inv := (- · : ℝ → ℝ)
@@ -141,7 +142,7 @@ instance : DnfGroup ℝ where
   mul_inv := add_neg_cancel
 
 #synth AddCommGroup ℂ
-instance : DnfGroup ℂ where
+example : DnfGroup ℂ where
   mul := (· + · : ℂ → ℂ → ℂ)
   one := (0 : ℂ)
   inv := (- · : ℂ → ℂ)
@@ -151,9 +152,9 @@ instance : DnfGroup ℂ where
   inv_mul := neg_add_cancel
   mul_inv := add_neg_cancel
 
-/- Example 1.1.4.(2) -/
+/- Example 1.1.2.(2) -/
 #synth CommGroupWithZero ℚ
-instance : DnfGroupWithZero ℚ where
+example : DnfGroupWithZero ℚ where
   zero := (0 : ℚ)
   one := (1 : ℚ)
   mul := (· * · : ℚ → ℚ → ℚ)
@@ -167,7 +168,7 @@ instance : DnfGroupWithZero ℚ where
   inv_mul_cancel := Rat.inv_mul_cancel
 
 #synth CommGroupWithZero ℝ
-noncomputable instance : DnfGroupWithZero ℝ where
+noncomputable example : DnfGroupWithZero ℝ where
   zero := (0 : ℝ)
   one := (1 : ℝ)
   mul := (· * · : ℝ → ℝ → ℝ)
@@ -184,7 +185,7 @@ noncomputable instance : DnfGroupWithZero ℝ where
     exact Real.field.mul_inv_cancel a ha
 
 #synth CommGroupWithZero ℂ
-noncomputable instance : DnfGroupWithZero ℂ where
+noncomputable example : DnfGroupWithZero ℂ where
   zero := (0 : ℂ)
   one := (1 : ℂ)
   mul := Complex.instField.mul
@@ -201,6 +202,8 @@ noncomputable instance : DnfGroupWithZero ℂ where
     exact Complex.instField.mul_inv_cancel a ha
 
 #synth CommMonoidWithZero ℤ
+-- A more satisfying formal specification would be as in the below comment:
+-- example (hG : CommGroupWithZero ℤ) (hzero : hG.zero = (0:ℤ)) (hmul : hG.mul = Int.mul) ... : False := by
 example : ¬∃ (inv : ℤ → ℤ), ∀ a : ℤ, a ≠ 0 → a * inv a = 1 := by
   intro h
   rcases h with ⟨inv, h⟩
@@ -211,70 +214,58 @@ example : ¬∃ (inv : ℤ → ℤ), ∀ a : ℤ, a ≠ 0 → a * inv a = 1 := b
   have hd2 : (1:ℤ) ∣ 2 := Int.one_dvd 2
   have : (1:ℤ) = 2 := Int.dvd_antisymm (by norm_num) (by norm_num) hd2 hd1
   norm_num at this
+  -- apply this
+  -- use hG.inv
+  -- intro a ha
+  -- exact hG.mul_inv_cancel a ha
 
 section
 variable {α β : Type*} [Group α] [Group β]
 
-/- Example 1.1.4.(3) -/
+/- Example 1.1.2.(3) -/
 section
+-- Vector spaces are additive groups with respect to vector addition.
 variable {F V : Type*} [Field F] [AddCommGroup V] [Module F V]
 end
 
-/- Example 1.1.4.(4) -/
+/- Example 1.1.2.(4) -/
 #synth {n : ℕ} → AddCommGroup (ZMod n)
-/- Example 1.1.4.(5) -/
+
+/- Example 1.1.2.(5) -/
 #synth {n : ℕ} → CommGroup (ZMod n)ˣ
 
-/- Example 1.1.4.(6) -/
+/- Example 1.1.2.(6) -/
 #synth Group (α × β)
 
 #check mul_left_eq_self
 #check mul_right_eq_self
-/-
-We allow ourselves the following lemmas and  from Mathlib's `Group`:
-  `mul_assoc`, `one_mul`, `mul_one`
+/- Proposition 1.1.(1) -/
+example (i j : α) (hi : ∀ a : α, i * a = a) (hj : ∀ a : α, a * j = a) : i = 1 ∧ j = 1 := by
+  have (i j : α) (hi : ∀ a : α, i * a = a) (hj : ∀ a : α, a * j = a) :  i = j := by
+   rw [← hi j, hj i]
+  exact ⟨this i 1 hi mul_one, (this 1 j one_mul hj).symm⟩
+/- Note that the equivalent `mul_left_eq_self`, `mul_right_eq_self` in Mathlib is proved in terms of general cancellation lemmas -/
+#check mul_left_eq_self
+#check mul_right_eq_self
 
-Proposition 1.(1) / Proposition 1.1.5.(1)
-Note that the equivalent `mul_left_eq_self`, `mul_right_eq_self` in Mathlib is proved in terms of general cancellation lemmas
--/
-theorem prop_1_1 : (∀ i j : α, (∀ a : α, i * a = a) → (∀ a : α, a * j = a) → i = 1 ∧ j = 1) := by
-  have prop_1_1_aux : (∀ i j : α, (∀ a : α, i * a = a) → (∀ a : α, a * j = a) → i = j) := by
-   intros i j hi hj
-   have hi' := hi j
-   have hj' := hj i
-   rw [← hi', hj']
-  intro i j hi hj
-  exact ⟨prop_1_1_aux i 1 hi mul_one, (prop_1_1_aux 1 j one_mul hj).symm⟩
-
-#check left_inv_eq_right_inv
-/-
-Proposition 1.(2) / Proposition 1.1.5.(2)
--/
-theorem prop_1_2 : (∀ a i j : α, i * a = 1 → a * j = 1 → i = a⁻¹ ∧ j = a⁻¹) := by
-  have prop_1_2_aux : (∀ a i j : α, i * a = 1 → a * j = 1 → i = j) := by
-    intros a i j hi hj
+/- Proposition 1.1.(2) -/
+example (a i j : α) (hi : i * a = 1) (hj : a * j = 1) : i = a⁻¹ ∧ j = a⁻¹ := by
+  have (a i j : α) (hi : i * a = 1) (hj : a * j = 1)  :  i = j :=
     calc i = i * 1 := (mul_one i).symm
       _ = i * (a * j) := by rw [hj]
       _ = (i * a) * j := by rw [mul_assoc]
       _ = 1 * j := by rw [hi]
       _ = j := one_mul j
-  intro a i j hi hj
-  exact ⟨prop_1_2_aux a i a⁻¹ hi (mul_inv_cancel a),
-  (prop_1_2_aux a a⁻¹ j (inv_mul_cancel a) hj).symm⟩
+  exact ⟨this a i a⁻¹ hi (mul_inv_cancel a),
+  (this a a⁻¹ j (inv_mul_cancel a) hj).symm⟩
+#check left_inv_eq_right_inv
 
+/- Proposition 1.1.(3) -/
+example (a : α) : a⁻¹⁻¹ = a := (left_inv_eq_right_inv (mul_inv_cancel _) (mul_inv_cancel _)).symm
 #check inv_inv
-/-
-Proposition 1.(3) / Proposition 1.1.5.(3)
--/
-theorem prop_1_3 : ∀ a : α, a⁻¹⁻¹ = a :=
-  λ a ↦ (prop_1_2 a⁻¹ a a (mul_inv_cancel a) (inv_mul_cancel a)).left.symm
 
-#check mul_inv_rev
-/-
-Proposition 1.(4) / Proposition 1.1.5.(4)
--/
-theorem prop_1_4 : ∀ a b : α, (a * b)⁻¹ = b⁻¹ * a⁻¹ := by
-  intros a b
+/- Proposition 1.1.(4) -/
+example (a b : α) : (a * b)⁻¹ = b⁻¹ * a⁻¹ := by
   set c := (a * b)⁻¹
   have : a * (b * c) = 1 := by
     rw [← mul_assoc, mul_inv_cancel]
@@ -285,30 +276,23 @@ theorem prop_1_4 : ∀ a b : α, (a * b)⁻¹ = b⁻¹ * a⁻¹ := by
     rw [this]
   rw [← mul_assoc, inv_mul_cancel, one_mul] at this
   exact this
+#check mul_inv_rev
 
-/-
-Proposition 1.(5) / Proposition 1.1.5.(5)
-
-we additionally allow ourselves the use of `pow_add`.
--/
+/- Proposition 1.1.(5) -/
 def bracket_l_r (a : α) : Tree Unit → α
   | Tree.nil => a
   | Tree.node _ l r => bracket_l_r a l * bracket_l_r a r
-theorem prop_1_5 : ∀ (a : α) (t : Tree Unit), bracket_l_r a t = a ^ t.numLeaves := by
-  intro a t
-  cases t
+theorem prop_1_5 (a : α) (t : Tree Unit) : bracket_l_r a t = a ^ t.numLeaves := by
+  induction t
   case nil => simp [bracket_l_r]
-  case node _ l r =>
-    have IHL := prop_1_5 a l
-    have IHR := prop_1_5 a r
+  case node _ l r IHL IHR =>
     dsimp [bracket_l_r]
     rw [IHL, IHR, pow_add]
 
-#check mul_left_cancel
 /-
-Proposition 2.(1) / Proposition 1.1.6.(1)
+Proposition 1.2.(1)
 -/
-theorem prop_2_1 : ∀ a u v : α, a * u = a * v → u = v := by
+example : ∀ a u v : α, a * u = a * v → u = v := by
   intros a u v h
   calc
     u = 1 * u := (one_mul u).symm
@@ -318,12 +302,11 @@ theorem prop_2_1 : ∀ a u v : α, a * u = a * v → u = v := by
     _ = (a⁻¹ * a) * v := by rw [mul_assoc]
     _ = 1 * v := by rw [inv_mul_cancel]
     _ = v := one_mul v
-
-#check mul_right_cancel
+#check mul_left_cancel
 /-
-Proposition 2.(2) / Proposition 1.1.6.(2)
+Proposition 1.2.(2)
 -/
-theorem prop_2_2 : ∀ a u v : α, u * a = v * a → u = v := by
+example : ∀ a u v : α, u * a = v * a → u = v := by
   intros a u v h
   calc
     u = u * 1 := (mul_one u).symm
@@ -333,16 +316,15 @@ theorem prop_2_2 : ∀ a u v : α, u * a = v * a → u = v := by
     _ = v * (a * a⁻¹) := by rw [mul_assoc]
     _ = v * 1 := by rw [mul_inv_cancel]
     _ = v := mul_one v
+#check mul_right_cancel
 
-
-/-
-Definition 1.1.7
+/- Definition 1.1.3
 The **order** of a group element is the smallest positive integer `n` such that `a ^ n = 1`.
 -/
 #check orderOf
 #check addOrderOf
 
-/- Examples 1.1.8.(1) -/
+/- Example 1.1.3.(1) -/
 example (a : α) : orderOf a = 1 ↔ a = 1 := by
   constructor
   · intro h
@@ -351,7 +333,7 @@ example (a : α) : orderOf a = 1 ↔ a = 1 := by
   · intro ident
     rw [ident]
     simp
-/- Examples 1.1.8.(2) -/
+/- Example 1.1.3.(2) -/
 example (a : ℤ) : addOrderOf a = 0 ↔ a ≠ 0 := by
   rw [addOrderOf_eq_zero_iff']
   constructor
@@ -404,7 +386,7 @@ example (a : ℂ) : addOrderOf a = 0 ↔ a ≠ 0 := by
     · linarith [hnpos]
     · apply h
       rfl
-/- Examples 1.1.8.(3) -/
+/- Example 1.1.3.(3) -/
 example : orderOf (-1 : ℚ) = 2 := by
   rw [orderOf_eq_iff (by norm_num)]
   constructor
@@ -471,7 +453,7 @@ example (a : ℝ) : orderOf a = 0 ↔ (a ≠ 1 ∧ a ≠ -1) := by
       have : |a ^ 2| = 1 := by rwa [abs_pow_eq_one _ hnne0] at this
       simp at this
       rcases this with rfl | rfl <;> norm_num at *
-/- Examples 1.1.8.(4) -/
+/- Example 1.1.3.(4) -/
 example : addOrderOf (6 : ZMod 9) = 3 := by
   rw [addOrderOf_eq_iff (by norm_num)]
   constructor
@@ -484,7 +466,7 @@ example : addOrderOf (5 : ZMod 9) = 9 := by
   · rfl
   · intro m mub mlb
     interval_cases m <;> intro contra <;> contradiction
-/- Examples 1.1.8.(5) -/
+/- Example 1.1.3.(5) -/
 example : orderOf (2 : ZMod 7) = 3 := by
   rw [orderOf_eq_iff (by norm_num)]
   constructor
@@ -498,7 +480,7 @@ example : orderOf (3 : ZMod 7) = 6 := by
   · intro m mub mlb
     interval_cases m <;> intro contra <;> contradiction
 
-/- Examples 1.1.9 **group table** -/
+/- Definition 1.1.4 **group table** -/
 
 namespace Exercises
 /- Exercise 1.1.1.(a) -/

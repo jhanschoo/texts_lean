@@ -58,7 +58,7 @@ example [Group α] (G : Subgroup α) (H : Subgroup α) (K : Subgroup α) (hGH : 
   intro x hx
   exact hHK (hGH hx)
 
-/- Proposition 2.2 -/
+/- Proposition 2.1 -/
 #check Subgroup.ofDiv
 example [Group α] (H : Set α) (h1 : Inhabited H) (h2 : ∀ (x y : α), x ∈ H → y ∈ H → x * y⁻¹ ∈ H) : ∃ H' : Subgroup α, H = H' := by
   have one_mem' : 1 ∈ H := by

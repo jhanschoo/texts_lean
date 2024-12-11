@@ -1,5 +1,7 @@
 import TextsLean.Basic
 
+-- TODO: update conventions and organization
+
 namespace Dnf.C00.S02
 
 namespace Exercises

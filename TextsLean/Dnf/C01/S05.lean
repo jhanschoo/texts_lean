@@ -4,7 +4,7 @@ namespace Dnf.C01.S05
 
 open QuaternionGroup
 
-/- Definition 1.5.1 -/
+/- Definition 1.5.1 **quaternion group** -/
 #check QuaternionGroup
 
 abbrev Q := QuaternionGroup 2
@@ -16,7 +16,7 @@ a 0 <-> +1
 a 1 <-> i
 a 2 <-> -1
 a 3 <-> -i
-Then consider the xa n to be similar but in the opposite direction
+Then consider the xa n to be similar but in the "opposite direction"
 xa 0 <-> j
 xa 1 <-> -k
 xa 2 <-> -j
