@@ -9,7 +9,7 @@ namespace Dnf.C02.S03
 #check Subgroup.zpowers
 #check AddSubgroup.zmultiples
 
-example [Group α] (x : α) : Subgroup.zpowers x = Subgroup.zpowers x⁻¹ := by sorry
+example [Group G] (x : G) : Subgroup.zpowers x = Subgroup.zpowers x⁻¹ := by sorry
 #check Subgroup.zpowers_inv
 
 #check IsCyclic.commGroup
@@ -30,7 +30,7 @@ example : AddSubgroup.zmultiples (-1 : ℤ) = ⊤ := by sorry
 
 /- Proposition 2.2 -/
 -- Note that by convention, 0 is used exactly to denote infinite order and cardinality here.
-example [Group α] (a : α) : Nat.card (Subgroup.zpowers a) = orderOf a := by sorry
+example [Group G] (a : G) : Nat.card (Subgroup.zpowers a) = orderOf a := by sorry
 #check Nat.card_zpowers
 
 /- Proposition 2.3 -/

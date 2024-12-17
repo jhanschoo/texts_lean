@@ -292,8 +292,7 @@ theorem prop_1_5 (a : α) (t : Tree Unit) : bracket_l_r a t = a ^ t.numLeaves :=
 /-
 Proposition 1.2.(1)
 -/
-example : ∀ a u v : α, a * u = a * v → u = v := by
-  intros a u v h
+example (a u v : α) (h : a * u = a * v) : u = v :=
   calc
     u = 1 * u := (one_mul u).symm
     _ = (a⁻¹ * a) * u := by rw [inv_mul_cancel]
@@ -303,11 +302,11 @@ example : ∀ a u v : α, a * u = a * v → u = v := by
     _ = 1 * v := by rw [inv_mul_cancel]
     _ = v := one_mul v
 #check mul_left_cancel
+
 /-
 Proposition 1.2.(2)
 -/
-example : ∀ a u v : α, u * a = v * a → u = v := by
-  intros a u v h
+example (a u v : α) (h : u * a = v * a) : u = v :=
   calc
     u = u * 1 := (mul_one u).symm
     _ = u * (a * a⁻¹) := by rw [mul_inv_cancel]
@@ -786,8 +785,7 @@ example : orderOf (17 : ZMod 36) = 2 := by
     interval_cases m ; intro contra ; contradiction
 
 /- Exercise 1.1.15 -/
-example : ∀ (l : List α), (List.prod l)⁻¹ = List.prod (List.reverse (List.map (·⁻¹) l)) := by
-  intro l
+example (l : List α) : (List.prod l)⁻¹ = List.prod (List.reverse (List.map (·⁻¹) l)) := by
   induction l
   case nil => simp
   case cons head tail ih => simp [ih]
@@ -810,13 +808,14 @@ example (x : α) : x ^ 2 = 1 ↔ orderOf x = 1 ∨ orderOf x = 2 := by
       exact pow_orderOf_eq_one x
 
 /- Exercise 1.1.17 -/
-example (x : α) (n : ℕ) (_npos : orderOf x > 0) (hord : orderOf x = n) : x⁻¹ = x ^ ((n:ℤ)-1) := by
+example (x : α) (n : ℕ) (_npos : orderOf x > 0) (hord : orderOf x = n) : x⁻¹ = x ^ ((n:ℤ)-1) :=
   calc
     x⁻¹ = 1 * x⁻¹ := by group
     _ = x ^ n * x⁻¹ := by rw [← hord, pow_orderOf_eq_one x]
     _ = x ^ (n:ℤ) * x⁻¹:= by norm_cast
     _ = x ^ ((n:ℤ) - 1) * x * x⁻¹:= by group
     _ = x ^ ((n:ℤ) - 1) := by group
+
 example (x : α) (orderOf_pos : orderOf x > 0) : x⁻¹ = x ^ (orderOf x - 1) := by
   have := orderOf_pos_iff.mp orderOf_pos
   rw [← IsOfFinOrder.val_inv_unit this]

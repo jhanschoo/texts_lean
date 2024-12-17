@@ -4,7 +4,7 @@ namespace Dnf.C02.S02
 
 /- Definition 2.2.1 **centralizer** -/
 #check Subgroup.centralizer
-example [Group α] (A : Set α) : Subgroup.centralizer A = { g : α | ∀ a ∈ A, g * a * g⁻¹ = a } := by
+example [Group G] (A : Set G) : Subgroup.centralizer A = { g : G | ∀ a ∈ A, g * a * g⁻¹ = a } := by
   simp only [Subgroup.centralizer, Set.centralizer, Subgroup.coe_set_mk]
   conv_rhs =>
     ext x
@@ -20,7 +20,7 @@ example [Group α] (A : Set α) : Subgroup.centralizer A = { g : α | ∀ a ∈ 
 #check Subgroup.normalizer
 #check Subgroup.setNormalizer
 
-example [Group α] (A : Set α) : Subgroup.centralizer A ≤ Subgroup.setNormalizer A := by
+example [Group G] (A : Set G) : Subgroup.centralizer A ≤ Subgroup.setNormalizer A := by
   simp [Subgroup.centralizer, Subgroup.setNormalizer, Set.centralizer]
   intro g hcA h
   constructor
@@ -48,7 +48,7 @@ example [Group α] (A : Set α) : Subgroup.centralizer A ≤ Subgroup.setNormali
 
 namespace Exercises
 /- Exercise 2.2.1 -/
-example [Group α] (A : Set α) : Subgroup.centralizer A = { g : α | ∀ a ∈ A, g⁻¹ * a * g = a } := by
+example [Group G] (A : Set G) : Subgroup.centralizer A = { g : G | ∀ a ∈ A, g⁻¹ * a * g = a } := by
   simp only [Subgroup.centralizer, Set.centralizer, Subgroup.coe_set_mk]
   conv_rhs =>
     ext x
@@ -57,14 +57,14 @@ example [Group α] (A : Set α) : Subgroup.centralizer A = { g : α | ∀ a ∈ 
     rw [← @mul_left_cancel_iff _ _ _ g _ _, ← mul_assoc, ← mul_assoc, mul_inv_cancel, one_mul]
 
 /- Exercise 2.2.2 -/
-example [Group α] : Subgroup.centralizer (Subgroup.center α) = (⊤ : Subgroup α) := by sorry
-example [Group α] : Subgroup.normalizer (Subgroup.center α) = (⊤ : Subgroup α) := by sorry
+example [Group G] : Subgroup.centralizer (Subgroup.center G : Set G) = (⊤ : Subgroup G) := by sorry
+example [Group G] : (Subgroup.center G).normalizer = (⊤ : Subgroup G) := by sorry
 
 /- Exercise 2.2.3 -/
-example [Group α] (A B : Set α) (hAB : A ⊆ B) : Subgroup.centralizer B ≤ Subgroup.centralizer A := by sorry
+example [Group G] (A B : Set G) (hAB : A ⊆ B) : Subgroup.centralizer B ≤ Subgroup.centralizer A := by sorry
 
 /- Exercise 2.2.4 TODO -/
-example [Group α] (A B : Set α) (hAB : A ⊆ B) : Subgroup.centralizer B ≤ Subgroup.centralizer A := by sorry
+example [Group G] (A B : Set G) (hAB : A ⊆ B) : Subgroup.centralizer B ≤ Subgroup.centralizer A := by sorry
 
 /- Exercise 2.2.5.(a) -/
 example : Subgroup.centralizer ({1, c[0, 1, 2], c[0, 2, 1]} : Set (Equiv.Perm (Fin 3))) = ({1, c[0, 1, 2], c[0, 2, 1]} : Set (Equiv.Perm (Fin 3))) := by sorry
@@ -80,12 +80,12 @@ example : Subgroup.setNormalizer ({ g | g = 1 ∨ g = sr 0 ∨ g = r 2 ∨ g = s
 open DihedralGroup in
 example : Subgroup.centralizer (Subgroup.zpowers (r 1) : Subgroup (DihedralGroup 10)) = (Subgroup.zpowers (r 1) : Subgroup (DihedralGroup 10)) := by sorry
 open DihedralGroup in
-example : Subgroup.normalizer (Subgroup.zpowers (r 1) : Subgroup (DihedralGroup 10)) = (⊤ : Subgroup (DihedralGroup 10)) := by sorry
+example : (Subgroup.zpowers (r 1) : Subgroup (DihedralGroup 10)).normalizer = (⊤ : Subgroup (DihedralGroup 10)) := by sorry
 
 /- Exercise 2.2.6.(a) -/
-example [Group α] (H : Subgroup α) : H ≤ Subgroup.normalizer H := by sorry
+example [Group G] (H : Subgroup G) : H ≤ H.normalizer := by sorry
 /- Exercise 2.2.6.(b) -/
-example [Group α] (H : Subgroup α) : H ≤ Subgroup.centralizer H ↔ Subgroup.IsCommutative H := by sorry
+example [Group G] (H : Subgroup G) : H ≤ (H:Set G).centralizer ↔ H.IsCommutative := by sorry
 
 /- Exercise 2.2.7.(a) -/
 open DihedralGroup in
@@ -102,14 +102,14 @@ example (n : ℕ) (i : Fin n) : Nat.card (MulAction.stabilizer (Equiv.Perm (Fin 
 
 /- Exercise 2.2.9 -/
 open Pointwise in
-example [Group α] (H : Subgroup α) (A : Set α) [hAne : Nonempty A] : Subgroup.setNormalizer A ⊓ H = { h : α | h ∈ H ∧ A = ({h} : Set α) * A * {h⁻¹} } := by sorry
+example [Group G] (H : Subgroup G) (A : Set G) [hAne : Nonempty A] : Subgroup.setNormalizer A ⊓ H = { h : G | h ∈ H ∧ A = ({h} : Set G) * A * {h⁻¹} } := by sorry
 
 /- Exercise 2.2.10 -/
-example [Group α] (H : Subgroup α) (hHcard : Nat.card H = 2) : Subgroup.normalizer H = Subgroup.centralizer H := by sorry
-example [Group α] (H : Subgroup α) (hHcard : Nat.card H = 2) (hNorm : Subgroup.normalizer H = ⊤) : H ≤ Subgroup.center α := by sorry
+example [Group G] (H : Subgroup G) (hHcard : Nat.card H = 2) : H.normalizer = Subgroup.centralizer (H : Set G) := by sorry
+example [Group G] (H : Subgroup G) (hHcard : Nat.card H = 2) (hNorm : H.normalizer = ⊤) : H ≤ Subgroup.center G := by sorry
 
 /- Exercise 2.2.11 -/
-example [Group α] (A : Set α) : Subgroup.center α ≤ Subgroup.centralizer A := by sorry
+example [Group G] (A : Set G) : Subgroup.center G ≤ Subgroup.centralizer A := by sorry
 
 /- Exercise 2.2.12 -/
 section

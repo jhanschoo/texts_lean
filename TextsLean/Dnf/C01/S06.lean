@@ -50,7 +50,7 @@ instance (e : α ≃ β) : Equiv.Perm α ≃ Equiv.Perm β :=
 namespace Exercises
 
 /- Exercise 1.6.1.(a) -/
-example [Group α] [Group β] (φ : α →* β) (x : α) (n : ℕ) : φ (x ^ n) = φ x ^ n := by
+example [Group G] [Group H] (φ : G →* H) (x : G) (n : ℕ) : φ (x ^ n) = φ x ^ n := by
   induction n
   case zero => simp
   case succ n ih =>
@@ -59,14 +59,14 @@ example [Group α] [Group β] (φ : α →* β) (x : α) (n : ℕ) : φ (x ^ n) 
       _ = φ (x ^ n) * φ x := by rw [φ.map_mul]
       _ = φ x ^ n * φ x := by rw [ih]
       _ = φ x ^ n.succ := by rw [pow_succ]
-example [Group α] [Group β] (φ : α →* β) (x : α) (n : ℕ) : φ (x ^ n) = φ x ^ n := MonoidHom.map_pow φ x n
+example [Group G] [Group H] (φ : G →* H) (x : G) (n : ℕ) : φ (x ^ n) = φ x ^ n := MonoidHom.map_pow φ x n
 /- Exercise 1.6.1.(b) -/
-example [Group α] [Group β] (φ : α →* β) (x : α) (n : ℤ) : φ (x ^ n) = φ x ^ n := MonoidHom.map_zpow φ x n
+example [Group G] [Group H] (φ : G →* H) (x : G) (n : ℤ) : φ (x ^ n) = φ x ^ n := MonoidHom.map_zpow φ x n
 -- the proof is located here, and is in respect to a more general context:
 #check map_zpow'
 
 /- Exercise 1.6.2 -/
-example [Group α] [Group β] (e : α ≃* β) (x : α) : orderOf (e x) = orderOf x := orderOf_injective e.toMonoidHom e.injective x
+example [Group G] [Group H] (e : G ≃* H) (x : G) : orderOf (e x) = orderOf x := orderOf_injective e.toMonoidHom e.injective x
 #check MulEquiv.orderOf_eq
 #check AddEquiv.addOrderOf_eq
 /- The result holds whenever φ is injective. -/
@@ -78,7 +78,7 @@ example (f : ZMod 2 →+ Unit) : f 1 = () ∧ addOrderOf (1 : ZMod 2) = 2 ∧ ad
 example (f : ZMod 2 →+ Unit) (x : ZMod 2) (hord : addOrderOf (f x) = addOrderOf x) : False := by sorry
 
 /- Exercise 1.6.3 -/
-example [CommGroup α] [Mul β] (e : α ≃* β) (x y : β) : x * y = y * x :=
+example [CommGroup G] [Mul H] (e : G ≃* H) (x y : H) : x * y = y * x :=
   calc
     x * y = e (e.symm x * e.symm y) := by simp
     _ = e (e.symm y * e.symm x) := by rw [mul_comm _ _]
@@ -192,10 +192,10 @@ example (e : α ≃ β) : Equiv.Perm α ≃* Equiv.Perm β := by
 end Exercises
 
 /- Exercise 1.6.11 -/
-example [Group α] [Group β] : α × β ≃* β × α := by sorry
+example [Group G] [Group H] : G × H ≃* H × G := by sorry
 
 /- Exercise 1.6.12 -/
-example [Group α] [Group β] [Group γ] : (α × β) × γ ≃* α × β × γ := by sorry
+example [Group G] [Group H] [Group K] : (G × H) × K ≃* G × H × K := by sorry
 
 /- Exercise 1.6.13 -/
 -- TODO

@@ -37,7 +37,6 @@ example : c[0, 1] * c[0, 2] = c[0, 2, 1] := by
 /- Definition 1.3.5 **length**, or **order** of a cycle. **disjoint** cycles -/
 
 /- TODO: statement that a permutation's cycle decomposition is unique -/
-
 namespace Exercises
 
 /- Exercise 1.3.1 -/
