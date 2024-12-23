@@ -2,7 +2,18 @@ import TextsLean.Basic
 
 namespace Dnf.C02.S01
 
-/- Definition 2.1.1 Subgroup -/
+/-- Definition 2.1.1 Subgroup -/
+example [Group G] (H : Set G) [hH : Nonempty H] (mul_mem : ∀ {x} {y} (_ : x ∈ H) (_ : y ∈ H), x * y ∈ H) (inv_mem : ∀ {x} (_ : x ∈ H), x⁻¹ ∈ H) : Subgroup G := {
+  carrier := H,
+  one_mem' := by
+    rcases hH with ⟨x, hx⟩
+    have := mul_mem hx (inv_mem hx)
+    simp only [mul_inv_cancel] at this
+    exact this,
+  mul_mem' := mul_mem,
+  inv_mem' := inv_mem
+}
+
 #check Subgroup
 #check Submonoid.one_mem
 #check Subgroup.inv_mem'
@@ -13,24 +24,24 @@ namespace Dnf.C02.S01
 -- Note that subgroups have commutativity automatically instantiated once the group is commutative.
 -- Note that elements of a subgroup immediately obey structures of the larger group, and in Lean this comes automatically since the elements are typed as elements of the larger group, and membership is defined as a property of subgroup structure.
 
-/- Examples 2.1.1 -/
-#synth RatCast ℝ
+/-- Examples 2.1.1 -/
 example : ∃ (Q : AddSubgroup ℝ), Q = { x : ℝ | ∃ q : ℚ, x = ↑q } := sorry
 example : ∃ (Z : AddSubgroup ℚ), Z = { q : ℚ | ∃ n : ℤ, q = (n:ℝ) } := sorry
+#synth RatCast ℝ
 /- TODO -/
 
-/- Examples 2.1.2 -/
+/-- Examples 2.1.2 -/
 example [Group G] : (Unique (⊥ : Subgroup G)) := inferInstance
 example [Group G] : Subgroup G := ⊥
-example [Group G] : ∃ (G : Subgroup G), G = (Set.univ : Set G) := by
+example [Group G] : ∃ (H : Subgroup G), H = ({(1 : G)} : Set G) := by
+  simp [← Subgroup.coe_bot]
+example [Group G] : (⊥ : Subgroup G) ≃* Fin 1 := sorry
+example [Group G] : ∃ (H : Subgroup G), H = (Set.univ : Set G) := by
   simp only [Subgroup.coe_eq_univ, exists_eq]
 example [Group G] : Subgroup G := ⊤
-example [Group G] : ∃ (G : Subgroup G), G = ({(1 : G)} : Set G) := by
-  simp [← Subgroup.coe_bot]
 example [Group G] : (⊤ : Subgroup G) ≃* G := Subgroup.topEquiv
-example [Group G] : (⊥ : Subgroup G) ≃* Fin 1 := sorry
 
-/- Examples 2.1.3 -/
+/-- Examples 2.1.3 -/
 example (n : ℕ) : Subgroup (DihedralGroup n) := Subgroup.closure {DihedralGroup.r 1}
 
 example (n : ℕ) [NeZero n] : Nat.card (Subgroup.zpowers (DihedralGroup.r 1 : DihedralGroup n)) = n := by
@@ -40,7 +51,7 @@ example (n : ℕ) [NeZero n] : Nat.card (Subgroup.zpowers (DihedralGroup.r 1 : D
     _ = Nat.card (Subgroup.zpowers (DihedralGroup.r 1 : DihedralGroup n)) := by
       rw [Nat.card_zpowers]
 
-/- Examples 2.1.4 -/
+/-- Examples 2.1.4 -/
 example : ∃ (G : AddSubgroup ℤ), G = { n : ℤ | Even n } := ⟨{
   carrier := { n : ℤ | Even n },
   zero_mem' := even_zero,
@@ -52,14 +63,13 @@ example : ∃ (G : AddSubgroup ℤ), G = { n : ℤ | Even n } := ⟨{
 /- TODO -/
 
 
-/- Examples 2.1.6 -/
-#check CompleteLattice (AddSubgroup ℤ)
+/-- Examples 2.1.6 -/
 example [Group α] (G : Subgroup α) (H : Subgroup α) (K : Subgroup α) (hGH : G ≤ H) (hHK : H ≤ K) : G ≤ K := by
   intro x hx
   exact hHK (hGH hx)
+#check CompleteLattice (AddSubgroup ℤ)
 
-/- Proposition 2.1 -/
-#check Subgroup.ofDiv
+/-- Proposition 2.1 -/
 example [Group G] (H : Set G) (h1 : Inhabited H) (h2 : ∀ (x y : G), x ∈ H → y ∈ H → x * y⁻¹ ∈ H) : ∃ H' : Subgroup G, H = H' := by
   have one_mem' : 1 ∈ H := by
     rcases h1 with ⟨x, hx⟩
@@ -83,6 +93,7 @@ example [Group G] (H : Set G) (h1 : Inhabited H) (h2 : ∀ (x y : G), x ∈ H �
     mul_mem' := mul_mem',
     inv_mem' := inv_mem'
   }, rfl⟩
+#check Subgroup.ofDiv
 
 namespace Exercises
 
@@ -102,7 +113,7 @@ theorem Rat.add_den_dvd_lcm (q₁ q₂: ℚ) : (q₁ + q₂).den ∣ q₁.den.lc
       <;> [exact Nat.gcd_dvd_right _ _ ; exact Nat.gcd_dvd_left _ _]
   · exact dvd_mul_right _ _
 
-/- Exercise 2.1.1.(a) -/
+/-- Exercise 2.1.1.(a) -/
 example : ∃ (G : AddSubgroup ℂ), G = { z : ℂ | z.re = z.im } := ⟨{
     carrier := { z : ℂ | z.re = z.im },
     zero_mem' := by simp,
@@ -115,8 +126,8 @@ example : ∃ (G : AddSubgroup ℂ), G = { z : ℂ | z.re = z.im } := ⟨{
       simp only [Set.mem_setOf_eq, Complex.neg_re, Complex.neg_im] at *
       rw [hx]
   }, rfl⟩
-/- Exercise 2.1.1.(b) -/
-#check Circle.coeHom
+
+/-- Exercise 2.1.1.(b) -/
 example : ∃ (G : Subgroup ℂˣ), G = { z : ℂˣ | Complex.abs z = 1 } := ⟨{
     carrier := { z : ℂˣ | Complex.abs z = 1 },
     one_mem' := by simp only [Set.mem_setOf_eq, Units.val_one, AbsoluteValue.map_one],
@@ -129,7 +140,9 @@ example : ∃ (G : Subgroup ℂˣ), G = { z : ℂˣ | Complex.abs z = 1 } := ⟨
       simp only [Set.mem_setOf_eq, Units.val_inv_eq_inv_val, map_inv₀, inv_eq_one] at *
       rw [hx]
   }, rfl⟩
-/- Exercise 2.1.1.(c) -/
+#check Circle.coeHom
+
+/-- Exercise 2.1.1.(c) -/
 example (n : ℕ) : ∃ (G : AddSubgroup ℚ), G = { q : ℚ | q.den ∣ n } := ⟨{
     carrier := { q : ℚ | q.den ∣ n },
     zero_mem' := by simp only [Set.mem_setOf_eq, Rat.den_ofNat, isUnit_one, IsUnit.dvd],
@@ -143,7 +156,8 @@ example (n : ℕ) : ∃ (G : AddSubgroup ℚ), G = { q : ℚ | q.den ∣ n } := 
       simp only [Set.mem_setOf_eq] at *
       rwa [Rat.neg_den]
   }, rfl⟩
-/- Exercise 2.1.1.(d) -/
+
+/-- Exercise 2.1.1.(d) -/
 example (n : ℕ) : ∃ (G : AddSubgroup ℚ), G = { q : ℚ | q.den.Coprime n } := ⟨{
     carrier := { q : ℚ | q.den.Coprime n },
     zero_mem' := by simp only [Set.mem_setOf_eq, Rat.den_ofNat, Nat.coprime_one_left_eq_true],
@@ -157,7 +171,8 @@ example (n : ℕ) : ∃ (G : AddSubgroup ℚ), G = { q : ℚ | q.den.Coprime n }
       simp only [Set.mem_setOf_eq] at *
       rwa [Rat.neg_den]
   }, rfl⟩
-/- Exercise 2.1.1.(e) -/
+
+/-- Exercise 2.1.1.(e) -/
 example : ∃ (G : Subgroup ℝˣ), G = { x : ℝˣ | ∃ r : ℚ, (r:ℝ) = x ^ 2 } := ⟨{
     carrier := { x : ℝˣ | ∃ r : ℚ, (r:ℝ) = x ^ 2 },
     one_mem' := by
@@ -184,10 +199,9 @@ example : ∃ (G : Subgroup ℝˣ), G = { x : ℝˣ | ∃ r : ℚ, (r:ℝ) = x ^
       push_cast
       rw [hx, sq, sq, mul_inv]
   }, rfl⟩
-
 #check Fin.mk_zero
 
-/- Exercise 2.1.2.(a) TODO: need to clarify if 1 is a reflection in the wording of the problem -/
+/-- Exercise 2.1.2.(a) TODO: need to clarify if 1 is a reflection in the wording of the problem -/
 example (n : ℕ) (hn : 3 ≤ n) (G : Subgroup (Equiv.Perm (Fin n))) (hG : G = { σ : Equiv.Perm (Fin n) | σ.IsSwap } ) : False := by
   let zero : Fin n := ⟨0, by linarith⟩
   let one : Fin n := ⟨1, by linarith⟩
@@ -260,55 +274,55 @@ example (n : ℕ) (hn : 3 ≤ n) (G : Subgroup (Equiv.Perm (Fin n))) (hG : G = {
         _ = x := by simp [Equiv.swap_apply_of_ne_of_ne hx0 hx1, Equiv.swap_apply_of_ne_of_ne hx0 hx2]
     exact hxy contra.symm
 
-/- Exercise 2.1.2.(b) TODO: need to clarify if 1 is a reflection in the wording of the problem -/
+/-- Exercise 2.1.2.(b) TODO: need to clarify if 1 is a reflection in the wording of the problem -/
 example (n : ℕ) (hn : 3 ≤ n) (G : Subgroup (DihedralGroup n)) (hg : G = { g : DihedralGroup n | ∃ i, g = DihedralGroup.sr i } ) : False := sorry
-/- Exercise 2.1.2.(c) -/
-example (n : ℕ) (hn : 1 ≤ n) (hnnprime : ¬Nat.Prime n) [Group G] (hg : ∃ (g : G), orderOf g = n) (G : Subgroup G) (hg : G = {g : G | g = 1 ∨ orderOf g = n} ) : False := sorry
-/- Exercise 2.1.2.(d) -/
+/-- Exercise 2.1.2.(c) -/
+example (n : ℕ) (hn : 1 ≤ n) (hnnprime : ¬Nat.Prime n) [Group G] (hg : ∃ (g : G), orderOf g = n) (H : Subgroup G) (hh : H = {g : G | g = 1 ∨ orderOf g = n} ) : False := sorry
+/-- Exercise 2.1.2.(d) -/
 example (G : AddSubgroup ℤ) (hg : G = {x : ℤ | x = 0 ∨ Odd x} ) : False := sorry
-/- Exercise 2.1.2.(e) -/
+/-- Exercise 2.1.2.(e) -/
 example (G : AddSubgroup ℝ) (hg : G = {x : ℝ | ∃ (q : ℚ), (q:ℝ) = x ^ 2 } ) : False := sorry
 
-/- Exercise 2.1.3.(a) -/
+/-- Exercise 2.1.3.(a) -/
 example : ∃ (G : Subgroup (DihedralGroup 4)), G = { g : DihedralGroup 4 | g = 1 ∨ g = DihedralGroup.r 2 ∨ g = DihedralGroup.sr 0 ∨ g = DihedralGroup.sr 2 } := ⟨{
   carrier := { g : DihedralGroup 4 | g = 1 ∨ g = DihedralGroup.r 2 ∨ g = DihedralGroup.sr 0 ∨ g = DihedralGroup.sr 2 }
   mul_mem' := sorry
   one_mem' := by simp
   inv_mem' := sorry
 }, rfl⟩
-/- Exercise 2.1.3.(b) -/
+/-- Exercise 2.1.3.(b) -/
 example : ∃ (G : Subgroup (DihedralGroup 4)), G = { g : DihedralGroup 4 | g = 1 ∨ g = DihedralGroup.r 2 ∨ g = DihedralGroup.sr 1 ∨ g = DihedralGroup.sr 3 } := sorry
 
-/- Exercise 2.1.4 -/
+/-- Exercise 2.1.4 -/
 example : ∃ (G : Type) (ha : Group G) (H : Set G) (_ : Infinite H), ∀ (H' : Subgroup G) (hHH' : H' = H), False := sorry
 
-/- Exercise 2.1.5 -/
+/-- Exercise 2.1.5 -/
 example [Group G] (hcard : 2 < Nat.card G) (H : Subgroup G) : Nat.card H + 1 < Nat.card G := sorry
 
-/- Exercise 2.1.6 -/
-#check CommGroup.torsion
+/-- Exercise 2.1.6 -/
 example [CommGroup G] : ∃ (H : Subgroup G), H = { g : G | IsOfFinOrder g } := sorry
 example : ∃ (G : Type) (ha : Group G), ∀ (H : Subgroup G), ¬H = { g : G | IsOfFinOrder g } := sorry
+#check CommGroup.torsion
 
-/- Exercise 2.1.7 -/
-#check fun (n : ℕ) ↦ AddCommGroup.torsion (ℤ × ZMod n)
+/-- Exercise 2.1.7 -/
 example (n : ℕ) (hn : 1 < n) : ∃ (H : AddSubgroup (ℤ × ZMod n)), H = { g : ℤ × ZMod n | IsOfFinOrder g } := sorry
 example (n : ℕ) (hn : 1 < n) : ∀ (H : AddSubgroup (ℤ × ZMod n)), ¬H = { g : ℤ × ZMod n | g = 1 ∨ ¬IsOfFinOrder g } := sorry
+#check fun (n : ℕ) ↦ AddCommGroup.torsion (ℤ × ZMod n)
 
-/- Exercise 2.1.8 -/
+/-- Exercise 2.1.8 -/
 example [Group G] (H K S : Subgroup G) (hS : S = (H:Set G) ∪ K) : (H:Set G) ⊆ K ∨ (K:Set G) ⊆ H := sorry
 example [Group G] (H K : Subgroup G) (hU : H ⊔ K = (H:Set G) ∪ K) : (H:Set G) ⊆ K ∨ (K:Set G) ⊆ H := sorry
 
-/- Exercise 2.1.9 -/
+/-- Exercise 2.1.9 -/
+example (n : ℕ) [CommRing R] : ∃ (SL : Subgroup (GL (Fin n) R)), SL = { A : GL (Fin n) R | A.det = 1 } := sorry
+open MatrixGroups in
+example (n : ℕ) [CommRing R] : ∃ (SL : Subgroup (GL (Fin n) R)), SL = Subgroup.map Matrix.SpecialLinearGroup.toGL (⊤ : Subgroup (SL(n, R))) := sorry
 #check Matrix.SpecialLinearGroup
 #check Matrix.GeneralLinearGroup
 #check Matrix.SpecialLinearGroup.toGL
 #check Matrix.SpecialLinearGroup.hasCoeToGeneralLinearGroup
-example (n : ℕ) [CommRing R] : ∃ (SL : Subgroup (GL (Fin n) R)), SL = { A : GL (Fin n) R | A.det = 1 } := sorry
-open MatrixGroups in
-example (n : ℕ) [CommRing R] : ∃ (SL : Subgroup (GL (Fin n) R)), SL = Subgroup.map Matrix.SpecialLinearGroup.toGL (⊤ : Subgroup (SL(n, R))) := sorry
 
-/- Exercise 2.1.10.(a) -/
+/-- Exercise 2.1.10.(a) -/
 example [Group G] (H K : Subgroup G) : ∃ (I : Subgroup G), I = (H : Set G) ∩ K:= ⟨H ⊓ K, rfl⟩
 example [Group G] (H K : Subgroup G) : ∃ (I : Subgroup G), I = (H : Set G) ∩ K:= ⟨{
   carrier := (H : Set G) ∩ K,
@@ -324,7 +338,7 @@ example [Group G] (H K : Subgroup G) : ∃ (I : Subgroup G), I = (H : Set G) ∩
     simp only [Set.mem_inter_iff, SetLike.mem_coe]
     exact ⟨H.inv_mem hx.1, K.inv_mem hx.2⟩
 }, rfl⟩
-/- Exercise 2.1.10.(b) -/
+/-- Exercise 2.1.10.(b) -/
 example [Group G] (S : Set (Subgroup G)) : ∃ (I : Subgroup G), I = ⋂ H ∈ S, (H : Set G) := ⟨(⨅ G ∈ S, G), by simp only [Subgroup.coe_iInf]⟩
 example [Group G] (S : Set (Subgroup G)) : ∃ (I : Subgroup G), I = ⋂ H ∈ S, (H : Set G) := ⟨{
   carrier := ⋂ H ∈ S, (H : Set G),
@@ -341,21 +355,21 @@ example [Group G] (S : Set (Subgroup G)) : ∃ (I : Subgroup G), I = ⋂ H ∈ S
     intros x hx G hG
     exact G.inv_mem (hx G hG)
 }, rfl⟩
-/- Exercise 2.1.11.(a) -/
+/-- Exercise 2.1.11.(a) -/
 example [Group A] [Group B] : ∃ (H : Subgroup (A × B)), H = { (_, b) : A × B | b = 1 } := ⟨{
   carrier := { (_, b) : A × B | b = 1 },
   one_mem' := by simp only [Set.mem_setOf_eq, Prod.snd_one],
   mul_mem' := by simp only [Set.mem_setOf_eq, Prod.snd_mul, Prod.forall, forall_eq_apply_imp_iff, mul_one, imp_self, implies_true],
   inv_mem' := by simp only [Set.mem_setOf_eq, Prod.snd_inv, inv_eq_one, imp_self, implies_true]
 }, rfl⟩
-/- Exercise 2.1.11.(b) -/
+/-- Exercise 2.1.11.(b) -/
 example [Group A] [Group B] : ∃ (H : Subgroup (A × B)), H = { (a, _) : A × B | a = 1 } := ⟨{
   carrier := { (a, _) : A × B | a = 1 },
   one_mem' := by simp only [Set.mem_setOf_eq, Prod.fst_one],
   mul_mem' := by simp only [Set.mem_setOf_eq, Prod.fst_mul, Prod.forall, forall_const, forall_eq_apply_imp_iff, mul_one, imp_self, implies_true],
   inv_mem' := by simp only [Set.mem_setOf_eq, Prod.fst_inv, inv_eq_one, imp_self, implies_true]
 }, rfl⟩
-/- Exercise 2.1.11.(c) -/
+/-- Exercise 2.1.11.(c) -/
 example [Group G] : ∃ (H : Subgroup (G × G)), H = { (a, b) : G × G | a = b } := ⟨{
   carrier := { (a, b) : G × G | a = b },
   one_mem' := by simp only [Set.mem_setOf_eq, Prod.fst_one, Prod.snd_one],
@@ -364,7 +378,7 @@ example [Group G] : ∃ (H : Subgroup (G × G)), H = { (a, b) : G × G | a = b }
   inv_mem' := by simp only [Set.mem_setOf_eq, Prod.fst_inv, Prod.snd_inv, inv_inj, imp_self,
     implies_true]
 }, rfl⟩
-/- Exercise 2.1.12.(a) -/
+/-- Exercise 2.1.12.(a) -/
 example (n : ℤ) [CommGroup G] : ∃ (H : Subgroup G), H = { g : G | ∃ a, g = a ^ n } := ⟨{
   carrier := { g : G | ∃ a, g = a ^ n },
   one_mem' := by simp only [Set.mem_setOf_eq]; use 1; simp only [one_zpow],
@@ -379,7 +393,7 @@ example (n : ℤ) [CommGroup G] : ∃ (H : Subgroup G), H = { g : G | ∃ a, g =
     use x'⁻¹
     rw [inv_zpow, hx]
 }, rfl⟩
-/- Exercise 2.1.12.(b) -/
+/-- Exercise 2.1.12.(b) -/
 example (n : ℤ) [CommGroup G] : ∃ (H : Subgroup G), H = { g : G | g ^ n = 1 } := ⟨{
   carrier := { g : G | g ^ n = 1 },
   one_mem' := by simp only [Set.mem_setOf_eq, one_zpow],
@@ -391,19 +405,19 @@ example (n : ℤ) [CommGroup G] : ∃ (H : Subgroup G), H = { g : G | g ^ n = 1 
     simp only [Set.mem_setOf_eq, inv_zpow', zpow_neg, inv_eq_one, imp_self, implies_true]
 }, rfl⟩
 
-/- Exercise 2.1.13 -/
+/-- Exercise 2.1.13 -/
 example (H : AddSubgroup ℚ) (mH : ∀ (q : ℚ), q⁻¹ ∈ H) : H = ⊥ ∨ H = ⊤ := by
   by_cases hntriv : H = ⊥
   · exact Or.inl hntriv
   · sorry
     -- a nonzero rational q exists. q.num and q.den are coprime. By Bezout's identity, we can find some multiple of q that added to some multiple of q⁻¹ gives 1. Now, consider an arbitrary rational r. By multiplication we have r.den in the subgroup, so r.den⁻¹ is in it too, and so r.num copies of it give that r lies in the subgroup.
-/- Exercise 2.1.14 -/
+/-- Exercise 2.1.14 -/
 example (n : ℕ) (hn : 3 ≤ n) (H : Subgroup (DihedralGroup n)) : ¬H = { g : DihedralGroup n | g ^ 2 = 1 } := sorry
-/- Exercise 2.1.15 -/
+/-- Exercise 2.1.15 -/
 example [Group G] (C : Set (Subgroup G)) (hU : SuccChain (· ≤ · ) C) : ∃ (U : Subgroup G), U = ⋃ H ∈ C, (H : Set G) := sorry
-/- Exercise 2.1.16 -/
+/-- Exercise 2.1.16 -/
 example (n : ℕ) (hn : 0 < n) [CommRing R] : ∃ (Utm : Subgroup (GL (Fin n) R)), Utm = { A : GL (Fin n) R | ∀ i j (hij : j < i), A i j = 0 } := sorry
-/- Exercise 2.1.17 -/
+/-- Exercise 2.1.17 -/
 example (n : ℕ) (hn : 0 < n) [CommRing R] : ∃ (Ltm : Subgroup (GL (Fin n) R)), Ltm = { A : GL (Fin n) R | (∀ i j (hij : i < j), A i j = 0) ∧ (∀ i, A i i = 1) } := sorry
 
 end Exercises

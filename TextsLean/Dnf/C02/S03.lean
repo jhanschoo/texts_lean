@@ -3,17 +3,32 @@ import TextsLean.Basic
 namespace Dnf.C02.S03
 
 /- Definition 2.3.1 **cyclic group**, **Cyclic subgroup** -/
+example [Group G] : IsCyclic G ↔ ∃ g : G, Function.Surjective (g ^ · : ℤ → G) := by
+  constructor <;> intro h
+  · apply exists_zpow_surjective
+  · exact { exists_zpow_surjective := h }
 #check IsCyclic
 #check IsAddCyclic
+
 -- Note: In Mathlib, the conventional way to state that a subgroup is cyclic is exhibit a zpowers generator, but there exists a predicate IsCommutative to state that a Subgroup is abelian.
 #check Subgroup.zpowers
 #check AddSubgroup.zmultiples
 
-example [Group G] (x : G) : Subgroup.zpowers x = Subgroup.zpowers x⁻¹ := by sorry
+example [Group G] (x : G) : Subgroup.zpowers x = Subgroup.zpowers x⁻¹ :=
+  eq_of_forall_ge_iff fun _ ↦ by simp only [Subgroup.zpowers_le, inv_mem_iff]
 #check Subgroup.zpowers_inv
 
+example [hG : Group G] [IsCyclic G] : CommGroup G := {
+  hG with
+  mul_comm := fun x y ↦
+      let ⟨_, hg⟩ := IsCyclic.exists_generator (α := G)
+      let ⟨_, hn⟩ := hg x
+      let ⟨_, hm⟩ := hg y
+      hm ▸ hn ▸ zpow_mul_comm _ _ _
+}
 #check IsCyclic.commGroup
 #check IsAddCyclic.addCommGroup
+
 #check Subgroup.zpowers_isCommutative
 #check AddSubgroup.zmultiples_isCommutative
 
