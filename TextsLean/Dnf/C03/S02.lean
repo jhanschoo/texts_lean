@@ -2,7 +2,7 @@ import TextsLean.Basic
 
 namespace Dnf.C03.S02
 
-/- Theorem 3.8 -/
+/-- Theorem 3.8 -/
 example [Group G] (H : Subgroup G) : Nat.card H ∣ Nat.card G := by sorry
 open Pointwise in
 example [Group G] (H : Subgroup G) : Nat.card G = Nat.card H * Nat.card (G ⧸ H) := by sorry

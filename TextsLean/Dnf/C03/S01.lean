@@ -2,8 +2,8 @@ import TextsLean.Basic
 
 namespace Dnf.C03.S01
 
-/- Example 3.1.1 -/
 section
+/-- Example 3.1.1 -/
 def φ : ℤ →+ ZMod n := ({
   toFun : ℤ → ZMod n := fun a ↦ a,
   map_zero' := by simp only [Int.cast_zero],
@@ -40,14 +40,12 @@ example [Group G] [Group H] (φ : G →* H) (g : G) : φ g⁻¹ = (φ g)⁻¹ :=
 example [Group G] [Group H] (φ : G →* H) (g : G) (n : ℕ) : φ (g ^ n) = φ g ^ n := by rw [map_pow]
 #check MonoidHom.map_pow
 
-/- Proposition 3.1.(4) -/
-example [Group G] [Group H] (φ : G →* H) : ∃ (K : Subgroup G), K = { g : G | φ g = 1 } := by
+/-- Proposition 3.1.(4) -/
+example [Group G] [Group H] (φ : G →* H) : ∃ (K : Subgroup G), K = φ.ker := by
   use φ.ker
-  ext g
-  rw [SetLike.mem_coe, MonoidHom.mem_ker, Set.mem_setOf_eq]
 #check fun {G H : Type*} [Group G] [Group H] (φ : G →* H) ↦ φ.ker
 
-/- Proposition 3.1.(5) -/
+/-- Proposition 3.1.(5) -/
 example [Group G] [Group H] (φ : G →* H) : ∃ (I : Subgroup H), I = φ '' (⊤ : Subgroup G) := by
   use φ.range
   ext h
@@ -55,27 +53,43 @@ example [Group G] [Group H] (φ : G →* H) : ∃ (I : Subgroup H), I = φ '' (�
   simp only [Set.mem_univ, true_and]
 #check Subgroup.map
 
-/-- Definition 3.1.2 **quotient group** -/
-example [Group G] [Group H] (φ : G →* H) (_ : G ⧸ φ.ker) : True := by simp
+-- Note that the book uses a different definition of quotient group. We show that they are equivalent.
+/-- Definition 3.1.2 **quotient group**
 
-open scoped Pointwise in
-/-- Proposition 3.2.(1) **pointwise multiplication** -/
-example [Group G] [Group H] (φ : G →* H) (a : H) (X : Set G) (u : G) (hu : u ∈ X) (hX : X = φ⁻¹' {a}) : u • (φ.ker : Set G) = X := by sorry
-open scoped Pointwise in
-/-- Proposition 3.2.(2) **pointwise multiplication** -/
-example [Group G] [Group H] (φ : G →* H) (a : H) (X : Set G) (u : G) (hu : u ∈ X) (hX : X = φ⁻¹' {a}) : MulOpposite.op u • (φ.ker : Set G) = X := by sorry
+  Let $φ : G →* H$ have kernel $K$. The **quotient group**, or **factor group**, $G ⧸ K$ is the group whose elements are the fibers of $φ$ and whose binary operation is characterized as follows: the product of the fibers above $a b : G$ is the fiber above $ab : G$.
+-/
+example [Group G] [Group H] (φ : G →* H) : Group (G ⧸ φ.ker) := by infer_instance
+example [Group G] [Group H] (φ : G →* H) (a b : G) : (a : G ⧸ φ.ker) * (b : G ⧸ φ.ker) = (a * b : G) := by rfl
+-- Mathlib defines quotients in terms of equivalence classes, so we cannot definitionally say that the elements of `G ⧸ φ.ker` are related to the fibers of `φ`. But we do not need something so heavyweight as to draw an isomorphism either.
+example [Group G] [Group H] (φ : G →* H) (a b : G) : (a : G ⧸ φ.ker) = (b : G ⧸ φ.ker) ↔ φ ⁻¹' {φ a} = φ ⁻¹' {φ b} := by sorry
+example [Group G] [Group H] (φ : G →* H) : (∃ (i : Group (G ⧸ φ.ker)), i = (QuotientGroup.con (φ.ker)).group) ∧ ∀ p ∈ (QuotientGroup.con (φ.ker)).classes, ∃ h, p = φ ⁻¹' h := by
+  simp [Setoid.classes]
+  intro g
+  use {φ g}
+  ext g'
+  simp only [Set.mem_preimage, Set.mem_singleton_iff]
+  simp [QuotientGroup.con, QuotientGroup.leftRel, MulAction.orbitRel, MulAction.orbit]
+  constructor
+  · intro ⟨n, hn1, hn2⟩
+    simpa [hn2.symm]
+  · intro heq
+    use (g⁻¹ * g')
+    simp [heq]
+
+/-- Proposition 3.2 -/
+example [Group G] [Group H] (φ : G →* H) (a : H) (u : G) (hu : u ∈ φ⁻¹' {a}) : φ⁻¹' {a} = { x : G | ∃ k ∈ φ.ker, x = u * k } ∧ φ⁻¹' {a} = { x : G | ∃ k ∈ φ.ker, x = k * u } := by sorry
 
 open scoped Pointwise in
 /-- Definition 3.1.3.(1) **left coset** (note here we say that the notation is generalized to subsets) -/
-example [Mul G] (a : G) (S : Set G) : a • S = { e : G | ∃ a s, s ∈ S ∧ e = a * s } := by sorry
+example [Mul G] (a : G) (S : Set G) : a • S = { e : G | ∃ s ∈ S, e = a * s } := by sorry
 open scoped Pointwise in
 /-- Definition 3.1.3.(2) **right coset** (note here we say that the notation is generalized to subsets) -/
-example [Mul G] (a : G) (S : Set G) : MulOpposite.op a • S = { e : G | ∃ a s, s ∈ S ∧ e = s * a } := by sorry
+example [Mul G] (a : G) (S : Set G) : MulOpposite.op a • S = { e : G | ∃ s ∈ S, e = s * a } := by sorry
 
 open scoped Pointwise in
-example [Add G] (a : G) (S : Set G) : a +ᵥ S = { e : G | ∃ a s, s ∈ S ∧ e = a + s } := by sorry
+example [Add G] (a : G) (S : Set G) : a +ᵥ S = { e : G | ∃ s ∈ S, e = a + s } := by sorry
 open scoped Pointwise in
-example [Add G] (a : G) (S : Set G) : AddOpposite.op a +ᵥ S = { e : G | ∃ a s, s ∈ S ∧ e = s + a } := by sorry
+example [Add G] (a : G) (S : Set G) : AddOpposite.op a +ᵥ S = { e : G | ∃ s ∈ S, e = s + a } := by sorry
 
 open scoped Pointwise in
 /-- Definition 3.1.3.(3) **representative** -/
@@ -83,57 +97,72 @@ example [Group G] (a : G) (H : Subgroup G) : a ∈ a • (H:Set G) := by sorry
 open scoped Pointwise in
 example [Group G] (a : G) (H : Subgroup G) : a ∈ MulOpposite.op a • (H : Set G) := by sorry
 
-/- Theorem 3.3 -/
 open scoped Pointwise in
-example [Group G] (H : Subgroup G) (a b : G) : (a • (H:Set G)) * (b • H) = (a * b) • H := by sorry
-
--- TODO: examples
-
-/- Proposition 3.4 -/
+/-- Theorem 3.3 -/
+example [Group G] [Group H] (φ : G →* H) (a b : G) : (a • (φ.ker:Set G)) * (b • (φ.ker:Set G)) = (a * b) • φ.ker := by sorry
 open scoped Pointwise in
-example [Group G] (N : Subgroup G) (hNn : N.Normal) (a b : G) : (a • (N:Set G)) = b • N ↔ b ∈ (a • (N:Set G)) := by sorry
+example [Group G] [Group H] (φ : G →* H) (a b : G) : (a : G ⧸ φ.ker) * (b : G ⧸ φ.ker) = (a * b : G) := by sorry
 
-/- Proposition 3.5.1 -/
 open scoped Pointwise in
+/-- Proposition 3.4 -/
+example [Group G] (N : Subgroup G) [hNn : N.Normal] : ∃ (hs : Setoid G), s ∈ hs.classes ↔ ∃ (a : G), s = (a • (N : Set G) : Set G) := by sorry
+open scoped Pointwise in
+example [Group G] (N : Subgroup G) [hNn : N.Normal] (a b : G) : (a • (N:Set G)) = b • N ↔ b⁻¹ * a ∈ (N:Set G) := by sorry
+open scoped Pointwise in
+example [Group G] (N : Subgroup G) [hNn : N.Normal] (a b : G) : (a • (N:Set G)) = b • N ↔ b ∈ a • (N:Set G) := by sorry
+
+open scoped Pointwise in
+/-- Proposition 3.5.1 -/
 example [Group G] (N : Subgroup G) : (∀ (a b : G), (a • (N:Set G)) * (b • (N:Set G)) = (a * b) • (N:Set G)) ↔ N.Normal := by sorry
 
-/- Proposition 3.5.2 -/
 open scoped Pointwise in
+/-- Proposition 3.5.2 -/
 example [Group G] (N : Subgroup G) : ∃(_ : Group (G ⧸ N)), True ↔  N.Normal := by sorry
 #check QuotientGroup.Quotient.group
 #check one_leftCoset
 
 /- Definition 3.1.4 **conjugate** -/
+example [Group G] (g n : G) : MulAut.conj g n = g * n * g⁻¹ := by simp only [MulAut.conj_apply]
+#check MulAut.conj
+#check AddAut.conj
+example [Group G] (g : G) (n : G) : ConjAct.toConjAct g • n = g * n * g⁻¹ := ConjAct.toConjAct_smul _ _
+#check ConjAct
 -- These notions of conjugate are not parametrized by the element by which an element and its conjugate are conjugate.
 #check IsConj
-example [Monoid M] (a b : M) : IsConj a b ↔ IsConj a b := by sorry
+example [Monoid M] (a b : M) : IsConj a b ↔ IsConj b a := by sorry
 example [Group G] (n gngi : G) : IsConj n gngi ↔ ∃ g, g * n * g⁻¹ = gngi := by sorry
 #check conjugatesOf
 #check Group.conjugatesOfSet
 -- This gives a definition of conjugation by an element, as an action of a group, acting on a patient group, to produce conjugates.
-#check MulAut.conj
-#check ConjAct
 
 open Pointwise in
-example [Group G] {N : Subgroup G} : (∀ (g : G), MulAut.conj g • N = N) ↔ N.Normal := by sorry
+example [Group G] {N : Subgroup G} : (∀ (g : G), MulAut.conj g • N = N) ↔ N.Normal := ⟨Subgroup.Normal.of_conjugate_fixed, (fun h g ↦ @Subgroup.smul_normal _ _ g _ h)⟩
 #check Subgroup.Normal.of_conjugate_fixed
+#check Subgroup.smul_normal
 
-/- Theorem 3.6.(1)-(2) -/
+/-- Theorem 3.6.(1)-(2) -/
 example [Group G] (N : Subgroup G) : N.Normal ↔ N.normalizer = ⊤ := by sorry
-/- Theorem 3.6.(1)-(3) -/
+
 open Pointwise in
+/-- Theorem 3.6.(1)-(3) -/
 example [Group G] (N : Subgroup G) : N.Normal ↔ (∀ g : G, g • (N:Set G) = MulOpposite.op g • (N:Set G)) := by sorry
-/- Theorem 3.6.(1)-(4) -/
+/-- Theorem 3.6.(1)-(4) -/
 example [Group G] (N : Subgroup G) : N.Normal ↔ ∃(_ : Group (G ⧸ N)), True := by sorry
-/- Theorem 3.6.(1)-(5) -/
 open Pointwise in
+/-- Theorem 3.6.(1)-(5) -/
 example [Group G] (N : Subgroup G) : N.Normal ↔ (∀ g : G, MulAut.conj g • (N:Set G) ⊆ N) := by sorry
 
-/- Proposition 3.7 -/
+/-- Proposition 3.7 -/
 example [Group G] (N : Subgroup G) : N.Normal ↔ ∃ (H : Type*) (_ : MulOneClass H) (φ : G →* H), N = φ.ker := by sorry
 
-/- Proposition 3.8 **natural projection** -/
--- Note that even without the condition, π is uniquely determined.
-example [Group G] (N : Subgroup G) [N.Normal] : ∃ (π : G →* G⧸N), ∀ (Hbar : Subgroup (G⧸N)), ∃ (H' : Subgroup G), H' = π ⁻¹' (Hbar:Set (G⧸N)) := by sorry
+open scoped Pointwise in
+/-- Definition 3.8 **natural projection**
+
+  Let $N ⊴ G$. Then there exists a **natural projection** $π  G →* G ⧸ N$
+  such that $π(g) = gN$. Suppose $H'≤ G⧸N$. Then the **complete preimage** of $H'$ in $G$ is $π⁻¹\[H'\]$, and itself a subgroup of $G$.
+-/
+example [Group G] (N : Subgroup G) [N.Normal] :  (∀ (g : G), (QuotientGroup.mk' N) g = (g : G ⧸ N)) ∧ ∀ (Hbar : Subgroup (G⧸N)), ∃ (H' : Subgroup G), H' = (QuotientGroup.mk' N) ⁻¹' (Hbar:Set (G⧸N)) := by sorry
+#check QuotientGroup.mk'
+#check QuotientAddGroup.mk'
 
 end Dnf.C03.S01
