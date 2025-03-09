@@ -161,8 +161,56 @@ open scoped Pointwise in
   Let $N ⊴ G$. Then there exists a **natural projection** $π  G →* G ⧸ N$
   such that $π(g) = gN$. Suppose $H'≤ G⧸N$. Then the **complete preimage** of $H'$ in $G$ is $π⁻¹\[H'\]$, and itself a subgroup of $G$.
 -/
-example [Group G] (N : Subgroup G) [N.Normal] :  (∀ (g : G), (QuotientGroup.mk' N) g = (g : G ⧸ N)) ∧ ∀ (Hbar : Subgroup (G⧸N)), ∃ (H' : Subgroup G), H' = (QuotientGroup.mk' N) ⁻¹' (Hbar:Set (G⧸N)) := by sorry
+example [Group G] (N : Subgroup G) [N.Normal] :
+  (∀ (g : G), (QuotientGroup.mk' N) g = (g : G ⧸ N)) ∧
+  ∀ (Hbar : Subgroup (G⧸N)), ∃ (H' : Subgroup G),
+    H' = (QuotientGroup.mk' N) ⁻¹' (Hbar : Set (G⧸N)) := by sorry
 #check QuotientGroup.mk'
 #check QuotientAddGroup.mk'
+
+example [Group G] (N : Subgroup G) : N.Normal ↔ N.normalizer = ⊤ := by sorry
+#check Subgroup.normalizer_eq_top_iff
+
+/- ## Exercises -/
+section Exercises
+
+section
+variable [Group G] [Group H] (φ : G →* H)
+
+/- Exercise 3.1.1 -/
+example (E : Subgroup H) : ∃ (E' : Subgroup G), φ ⁻¹' E = E' := by sorry
+example (E : Subgroup H) : (E.comap φ) ≤ ⊤ := by sorry
+example (E : Subgroup H) [E.Normal] : (E.comap φ).Normal := by sorry
+#check Subgroup.comap
+
+/- Exercise 3.1.2 -/
+example (u w : G) (X Y Z : G ⧸ φ.ker)
+    (hu1 : X = u)
+    (hw : Z = w)
+    (hXYZ : Z = X * Y) :
+    ∃ v : G, v = Y ∧ u * v = w := by
+  have hint : (u⁻¹ * w : G) = Y := by sorry
+  sorry
+
+/- Exercise 3.1.3 -/
+example [CommGroup A] (B : Subgroup A) : CommGroup (A ⧸ B) := by sorry
+example : ∃ (G : Type*) (_ : Group G) (N : Subgroup G),
+  (CommGroup G → False) ∧
+  N ≠ ⊤ ∧ ∃ (_ : N.Normal) (_ : CommGroup (G ⧸ N)), True := by sorry
+
+/- Exercise 3.1.4 -/
+example (N : Subgroup G) [N.Normal] (g : G) (a : ℤ) :
+    (g : G ⧸ N) ^ a = (g ^ a : G) := by sorry
+
+/- Exercise 3.1.5 -/
+example (N : Subgroup G) [N.Normal] (g : G) (n : ℕ)
+  (hn : IsLeast { n | n > 0 ∧ (g ^ n : G) = (1 : G ⧸ N) } n) :
+    orderOf (g : G ⧸ N) = n := by sorry
+
+/- TODO -/
+
+end
+
+end Exercises
 
 end Dnf.C03.S01

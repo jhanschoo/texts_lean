@@ -4,9 +4,11 @@ namespace Dnf.C01.S01
 
 /- Definition 1.1.1.(1) **binary operation** -/
 #check {α : Type*} → (α → α → α)
-/- Definition 1.1.1.(2) **associative** -/
+/-- Definition 1.1.1.(2) **associative** -/
+example [Mul α] : Std.Commutative (· * · : α → _ → _) ↔ ∀ (a b c : α), a * b * c = a * (b * c) := by sorry
 #check Std.Associative
 /- Definition 1.1.1.(3) **commutative** -/
+example [Mul α] : Std.Commutative (· * · : α → _ → _) ↔ ∀ (a b : α), a * b = b * a := by sorry
 #check Std.Commutative
 
 /- Example 1.1.1.(1) -/
@@ -79,131 +81,40 @@ end
 /- Definition of **closure** -/
 
 /- Definition 1.1.2.(1) **group** -/
+example [Mul α] : (∃ (p : Group α), True) ↔
+  Std.Associative (· * · : α → _ → _) ∧
+  (∃ (e : α), ∀ a, a * e = a ∧  e * a = a ∧
+    (∀ (a : α), ∃ a', a * a' = e ∧ a' * a = e)) := by sorry
 #check Group
 #check AddGroup
-class DnfGroup (α : Type*) extends One α, Mul α, Inv α where
-  mul_assoc : ∀ a b c : α, a * b * c = a * (b * c)
-  one_mul : ∀ a : α, 1 * a = a
-  mul_one : ∀ a : α, a * 1 = a
-  mul_inv : ∀ a : α, a * a⁻¹ = 1
-  inv_mul : ∀ a : α, a⁻¹ * a = 1
 /- Lean defines a notion of a group with an element outside the invertibility structure added to it. -/
 #check GroupWithZero
-class DnfGroupWithZero (α : Type*) extends Zero α, One α, Mul α, Inv α where
-  mul_assoc : ∀ a b c : α, a * b * c = a * (b * c)
-  one_mul : ∀ a : α, 1 * a = a
-  mul_one : ∀ a : α, a * 1 = a
-  exists_pair_ne : ∃ (x y : α), x ≠ y
-  inv_zero : (0 : α)⁻¹ = 0
-  mul_inv_cancel : ∀ a : α, a ≠ 0 → a * a⁻¹ = 1
-  inv_mul_cancel : ∀ a : α, a ≠ 0 → a⁻¹ * a = 1
 
 /- Definition 1.1.2.(2) **abelian group** -/
+example [Group α] : (∃ (p : CommGroup α), True) ↔
+  Std.Commutative (· * · : α → _ → _) := by sorry
 #check CommGroup
 #check AddCommGroup
-class DnfCommGroup (α : Type* ) extends DnfGroup α where
-  mul_comm : ∀ a b : α, a * b = b * a
-#check CommGroupWithZero
-class DnfCommGroupWithZero (α : Type* ) extends DnfGroupWithZero α where
-  mul_comm : ∀ a b : α, a * b = b * a
 
 /- Example 1.1.2.(1) -/
 #synth AddCommGroup ℤ
-example : DnfGroup ℤ where
-  mul := (· + · : ℤ → ℤ → ℤ)
-  one := (0 : ℤ)
-  inv := (- · : ℤ → ℤ)
-  mul_assoc := add_assoc
-  one_mul := zero_add
-  mul_one := add_zero
-  mul_inv := Int.add_right_neg
-  inv_mul := Int.add_left_neg
 
 #synth AddCommGroup ℚ
-example : DnfGroup ℚ where
-  mul := (· + · : ℚ → ℚ → ℚ)
-  one := (0 : ℚ)
-  inv := (- · : ℚ → ℚ)
-  mul_assoc := add_assoc
-  one_mul := zero_add
-  mul_one := add_zero
-  inv_mul := neg_add_cancel
-  mul_inv := add_neg_cancel
 
 #synth AddCommGroup ℝ
-example : DnfGroup ℝ where
-  mul := (· + · : ℝ → ℝ → ℝ)
-  one := (0 : ℝ)
-  inv := (- · : ℝ → ℝ)
-  mul_assoc := add_assoc
-  one_mul := zero_add
-  mul_one := add_zero
-  inv_mul := neg_add_cancel
-  mul_inv := add_neg_cancel
 
 #synth AddCommGroup ℂ
-example : DnfGroup ℂ where
-  mul := (· + · : ℂ → ℂ → ℂ)
-  one := (0 : ℂ)
-  inv := (- · : ℂ → ℂ)
-  mul_assoc := add_assoc
-  one_mul := zero_add
-  mul_one := add_zero
-  inv_mul := neg_add_cancel
-  mul_inv := add_neg_cancel
 
 /- Example 1.1.2.(2) -/
 #synth CommGroupWithZero ℚ
-example : DnfGroupWithZero ℚ where
-  zero := (0 : ℚ)
-  one := (1 : ℚ)
-  mul := (· * · : ℚ → ℚ → ℚ)
-  inv := (·⁻¹ : ℚ → ℚ)
-  mul_assoc := mul_assoc
-  one_mul := one_mul
-  mul_one := mul_one
-  exists_pair_ne := ⟨_, _, Rat.zero_ne_one⟩
-  inv_zero := inv_zero
-  mul_inv_cancel := Rat.mul_inv_cancel
-  inv_mul_cancel := Rat.inv_mul_cancel
 
 #synth CommGroupWithZero ℝ
-noncomputable example : DnfGroupWithZero ℝ where
-  zero := (0 : ℝ)
-  one := (1 : ℝ)
-  mul := (· * · : ℝ → ℝ → ℝ)
-  inv := (·⁻¹ : ℝ → ℝ)
-  mul_assoc := mul_assoc
-  one_mul := one_mul
-  mul_one := mul_one
-  exists_pair_ne := Real.field.exists_pair_ne
-  inv_zero := inv_zero
-  mul_inv_cancel := Real.field.mul_inv_cancel
-  inv_mul_cancel := by
-    intro a ha
-    rw [Real.field.mul_comm]
-    exact Real.field.mul_inv_cancel a ha
 
 #synth CommGroupWithZero ℂ
-noncomputable example : DnfGroupWithZero ℂ where
-  zero := (0 : ℂ)
-  one := (1 : ℂ)
-  mul := Complex.instField.mul
-  inv := Complex.instField.inv
-  mul_assoc := Complex.instField.mul_assoc
-  one_mul := Complex.instField.one_mul
-  mul_one := Complex.instField.mul_one
-  exists_pair_ne := Complex.instField.exists_pair_ne
-  inv_zero := Complex.instField.inv_zero
-  mul_inv_cancel := Complex.instField.mul_inv_cancel
-  inv_mul_cancel := by
-    intro a ha
-    rw [Complex.instField.mul_comm]
-    exact Complex.instField.mul_inv_cancel a ha
 
 #synth CommMonoidWithZero ℤ
 -- A more satisfying formal specification would be as in the below comment:
--- example (hG : CommGroupWithZero ℤ) (hzero : hG.zero = (0:ℤ)) (hmul : hG.mul = Int.mul) ... : False := by
+-- example (hG : CommGroupWithZero ℤ) (hzero : hG.zero = (0:ℤ)) (hmul : hG.mul = Int.mul) ... : False := by sorry
 example : ¬∃ (inv : ℤ → ℤ), ∀ a : ℤ, a ≠ 0 → a * inv a = 1 := by
   intro h
   rcases h with ⟨inv, h⟩

@@ -138,7 +138,9 @@ noncomputable instance sm : SMul (Equiv.Perm (Fin 4)) (MvPolynomial (Fin 4) ℤ)
 
 /-- Exercise 2.2.12.(b) -/
 noncomputable instance : MulAction (Equiv.Perm (Fin 4)) (MvPolynomial (Fin 4) ℤ) := by
-  have rename_one (p : MvPolynomial (Fin 4) ℤ) : rename (1 : Equiv.Perm (Fin 4)) p = p := by rw [Equiv.Perm.coe_one, rename_id]
+  have rename_one (p : MvPolynomial (Fin 4) ℤ) : rename (1 : Equiv.Perm (Fin 4)) p = p := by
+    simp only [Equiv.Perm.coe_one, rename_id, AlgHom.coe_id, id_eq]
+
   have mul_smul (σ τ : Equiv.Perm (Fin 4)) (p : MvPolynomial (Fin 4) ℤ) : rename (σ * τ) p = rename σ (rename τ p) := by simp only [Equiv.Perm.coe_mul, rename_rename]
   exact {
     one_smul := rename_one,
@@ -187,7 +189,8 @@ open MvPolynomial
 noncomputable instance smn (n : ℕ) : SMul (Equiv.Perm (Fin n)) (MvPolynomial (Fin n) ℤ) := ⟨λ σ p => p.rename σ⟩
 
 noncomputable instance (n : ℕ) : MulAction (Equiv.Perm (Fin n)) (MvPolynomial (Fin n) ℤ) := by
-  have rename_one (p : MvPolynomial (Fin n) ℤ) : rename (1 : Equiv.Perm (Fin n)) p = p := by rw [Equiv.Perm.coe_one, rename_id]
+  have rename_one (p : MvPolynomial (Fin n) ℤ) : rename (1 : Equiv.Perm (Fin n)) p = p := by
+    simp only [Equiv.Perm.coe_one, rename_id, AlgHom.coe_id, id_eq]
   have mul_smul (σ τ : Equiv.Perm (Fin n)) (p : MvPolynomial (Fin n) ℤ) : rename (σ * τ) p = rename σ (rename τ p) := by simp only [Equiv.Perm.coe_mul, rename_rename]
   exact {
     one_smul := rename_one,

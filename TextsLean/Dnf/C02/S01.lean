@@ -3,16 +3,7 @@ import TextsLean.Basic
 namespace Dnf.C02.S01
 
 /-- Definition 2.1.1 Subgroup -/
-example [Group G] (H : Set G) [hH : Nonempty H] (mul_mem : ∀ {x} {y} (_ : x ∈ H) (_ : y ∈ H), x * y ∈ H) (inv_mem : ∀ {x} (_ : x ∈ H), x⁻¹ ∈ H) : Subgroup G := {
-  carrier := H,
-  one_mem' := by
-    rcases hH with ⟨x, hx⟩
-    have := mul_mem hx (inv_mem hx)
-    simp only [mul_inv_cancel] at this
-    exact this,
-  mul_mem' := mul_mem,
-  inv_mem' := inv_mem
-}
+example [Group G] (H : Set G) [hH : Nonempty H] : (∃ H' : Subgroup G, H' = H) ↔ ∀ (x y : G) (_ : x ∈ H) (_ : y ∈ H), x * y ∈ H ∧ x⁻¹ ∈ H := by sorry
 
 #check Subgroup
 #check Submonoid.one_mem
@@ -128,16 +119,16 @@ example : ∃ (G : AddSubgroup ℂ), G = { z : ℂ | z.re = z.im } := ⟨{
   }, rfl⟩
 
 /-- Exercise 2.1.1.(b) -/
-example : ∃ (G : Subgroup ℂˣ), G = { z : ℂˣ | Complex.abs z = 1 } := ⟨{
-    carrier := { z : ℂˣ | Complex.abs z = 1 },
-    one_mem' := by simp only [Set.mem_setOf_eq, Units.val_one, AbsoluteValue.map_one],
+example : ∃ (G : Subgroup ℂˣ), G = { z : ℂˣ | ‖(z:ℂ)‖ = 1 } := ⟨{
+    carrier := { z : ℂˣ | ‖(z:ℂ)‖ = 1 },
+    one_mem' := by simp only [Set.mem_setOf_eq, Units.val_one, norm_one],
     mul_mem' := by
       intros x y hx hy
-      simp only [Set.mem_setOf_eq, Units.val_mul, AbsoluteValue.map_mul] at hx hy ⊢;
+      simp only [Set.mem_setOf_eq, Units.val_mul, Complex.norm_mul] at hx hy ⊢;
       rw [hx, hy]; simp,
     inv_mem' := by
       intros x hx
-      simp only [Set.mem_setOf_eq, Units.val_inv_eq_inv_val, map_inv₀, inv_eq_one] at *
+      simp only [Set.mem_setOf_eq, Units.val_inv_eq_inv_val, norm_inv, inv_eq_one] at *
       rw [hx]
   }, rfl⟩
 #check Circle.coeHom
