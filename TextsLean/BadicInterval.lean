@@ -191,35 +191,33 @@ theorem badicSet_eq_iff (I : BadicType) {b : ℕ} (hb : 0 < b) (n i j : ℤ) : b
 
 /-- The intersection of the `t / b`th `b`-adic inverval of rank `n+1` and the `t % b`th `b`-adic set of rank `n` is the `t`th `b`-adic interval $T$ of rank `n` itself -/
 theorem badicI_rank_succ_inter_badicSet_eq (I : BadicType) {b : ℕ} (hb : 0 < b) (n t : ℤ) :
-    badicI I b (n+1) (t / b) ∩ badicSet I b n (t % b) = badicI I b n t := by
+    badicI I b (n+1) (t / b) ∩ badicSet I b n t = badicI I b n t := by
   apply subset_antisymm
   · intro x hx
     rw [badicSet_def, badicI_rank_succ_eq_biUnion_badicI _ (by positivity), Set.mem_inter_iff, Set.mem_iUnion₂, Set.mem_iUnion] at hx
     rcases hx with ⟨⟨n', hn', hxl⟩, k, hxr⟩
-    have : t % (b:ℤ) + k * (b:ℤ) = (n':ℤ) + t / b * ↑b := by
+    have : t + k * (b:ℤ) = (n':ℤ) + t / b * ↑b := by
       have := (pairwise_disjoint_on _).mp (pairwise_disjoint_badicI I b n)
-      rcases lt_trichotomy (t % (b:ℤ) + k * (b:ℤ)) ((n':ℤ) + t / b * ↑b) with ht | ht | ht
+      rcases lt_trichotomy (t + k * (b:ℤ)) ((n':ℤ) + t / b * ↑b) with ht | ht | ht
       · exfalso; exact (Set.not_disjoint_iff.mpr ⟨x, hxr, hxl⟩) (this ht)
       · exact ht
       · exfalso; exact (Set.not_disjoint_iff.mpr ⟨x, hxl, hxr⟩) (this ht)
-    have hn'' : t % b = n' := by
+    have hn'' : n' = t % b := by
       apply_fun (· % (b:ℤ)) at this
       simp [Int.add_emod] at this
       norm_cast at this
-      rwa [Nat.mod_eq_of_lt hn'] at this
-    have hk' : k = t / (b:ℤ) := by
-      rwa [hn'', add_left_cancel_iff, mul_right_cancel_iff_of_pos (by positivity)] at this
-    subst k
-    convert hxr
-    nth_rw 1 [← Int.ediv_add_emod' t b, add_comm]
+      rw [Nat.mod_eq_of_lt hn'] at this
+      symm
+    rwa [hn'', add_comm (t % b), Int.ediv_add_emod'] at hxl
   · simp only [subset_inter_iff]
     constructor
     · exact (badicI_subset_rank_succ_iff_ediv _ hb _ _ _).mpr rfl
-    · exact badicI_subset_badicSet_of_modEq _ _ _ _ _ (Int.mod_modEq _ _).symm
+    · exact badicI_subset_badicSet_of_modEq _ _ _ _ _ (Int.ModEq.refl _)
 
-/-- The intersection of the `t / b`th `b`-adic inverval of rank `n+1` and the `t % b`th `b`-adic set of rank `n` is the `t`th `b`-adic interval $T$ of rank `n` itself -/
+/-- We may derive the `t`th `b`-adic interval of rank `n` from the `t/b^k`-th `b`-adic interval of rank `k`, through
+  intersecting it with the `k` `b`-adic sets of ranks `n+i=n+0, n+1, ..., n+k-1`, where for the `n+i`-th ranked `b`-adic set we choose the `t/b^i`-th. -/
 theorem badicI_rank_add_biInter_badicSet_eq (I : BadicType) {b : ℕ} (hb : 0 < b) (n t : ℤ) (k : ℕ) :
-    badicI I b (n + k) (t / b ^ k) ∩ ⋂ i < k, badicSet I b (n + i) (t / b ^ i % b) = badicI I b n t := by
+    badicI I b (n + k) (t / b ^ k) ∩ ⋂ i < k, badicSet I b (n + i) (t / b ^ i) = badicI I b n t := by
   induction k generalizing n t
   case zero => simp
   case succ k' IH =>
