@@ -207,7 +207,7 @@ theorem badicI_rank_succ_inter_badicSet_eq (I : BadicType) {b : ℕ} (hb : 0 < b
       simp [Int.add_emod] at this
       norm_cast at this
       rw [Nat.mod_eq_of_lt hn'] at this
-      symm
+      exact this.symm
     rwa [hn'', add_comm (t % b), Int.ediv_add_emod'] at hxl
   · simp only [subset_inter_iff]
     constructor
