@@ -6,7 +6,7 @@ open scoped Function
 private theorem Int.ediv_mul_eq_sub_emod (a b : ℤ) : a / b * b = a - a % b :=
   eq_sub_iff_add_eq.mpr (Int.ediv_add_emod' _ _)
 
-private theorem Int.ediv_ediv_pow_eq_ediv_pow_add_one (x : ℤ) (hd : 0 < d) (n : ℕ) :
+private theorem Int.ediv_pow_add_one_eq_left (x : ℤ) (hd : 0 < d) (n : ℕ) :
     x / d / d ^ n = x / d ^ (n + 1) := by
   rw [← Int.mul_eq_mul_right_iff (by positivity : d ^ n ≠ 0),
     ← Int.mul_eq_mul_right_iff (by positivity : d ≠ 0),
@@ -41,6 +41,48 @@ private theorem Int.ediv_ediv_pow_eq_ediv_pow_add_one (x : ℤ) (hd : 0 < d) (n 
         _ = d ^ (n + 1) := by rw [Int.pow_succ]
   have hmodeq : x % d + x / d % d ^ n * d ≡ x / d * d + x % d [ZMOD d ^ (n + 1)] := by
     rw [add_comm (x % d), Int.pow_succ]
+    exact Int.ModEq.add_right _ (Int.ModEq.mul_right' (Int.mod_modEq _ _))
+  rw [Int.modEq_iff_add_fac] at hmodeq
+  rcases hmodeq with ⟨t, hmodeq⟩
+  rw [hmodeq, mul_comm (d ^ (n + 1)), Int.add_mul_emod_self]
+  exact this
+
+private theorem Int.ediv_pow_add_one_eq_right (x : ℤ) (hd : 0 < d) (n : ℕ) :
+    x / d ^ n / d = x / d ^ (n + 1) := by
+  rw [
+    ← Int.mul_eq_mul_right_iff (by positivity : d ≠ 0),
+    ← Int.mul_eq_mul_right_iff (by positivity : d ^ n ≠ 0),
+    mul_assoc (x / d ^ (n + 1)),
+    Int.ediv_mul_eq_sub_emod,
+    ← Int.pow_succ',
+    Int.ediv_mul_eq_sub_emod,
+    Int.sub_mul,
+    Int.ediv_mul_eq_sub_emod,
+    sub_sub,
+  ]
+  congr
+  /-
+    x / d ^ n % d ≡ x / d ^ n [ ZMOD d ]
+      ↔ (x / d ^ n % d) * d ^ n ≡ (x / d ^ n) * d ^ n [ ZMOD d ^ (n + 1) ]
+      ↔ x % d ^ n + (x / d ^ n % d) * d ^ n ≡ x [ ZMOD d ^ (n + 1) ]
+      ↔ x % d ^ n + (x / d ^ n % d) * d ^ n ≡ x % d ^ (n + 1)
+  -/
+  nth_rw 3 [← Int.ediv_add_emod' x (d ^ n)]
+  have : x % d ^ n + x / d ^ n % d * d ^ n = (x % d ^ n + x / d ^ n % d * d ^ n) % d ^ (n + 1) := by
+    refine (Int.emod_eq_of_lt ?_ ?_).symm
+    · exact Int.add_nonneg (Int.emod_nonneg _ (by positivity)) (Int.mul_nonneg (Int.emod_nonneg _ (by positivity)) (by positivity))
+    · calc
+        x % d ^ n + x / d ^ n % d * d ^ n
+          < d ^ n + x / d ^ n % d * d ^ n := by rel [Int.emod_lt_of_pos x (by positivity : 0 < d ^ n)]
+        _ = (1 + x / d ^ n % d) * d ^ n := by rw [add_mul, one_mul]
+        _ ≤ (1 + (d - 1)) * d ^ n := by
+          have : x / d ^ n % d < d := Int.emod_lt_of_pos _ hd
+          have := Int.le_sub_one_of_lt this
+          rel [this]
+        _ = d * d ^ n := by rw [add_comm, sub_add_cancel]
+        _ = d ^ (n + 1) := by rw [Int.pow_succ']
+  have hmodeq : x % d ^ n + x / d ^ n % d * d ^ n ≡ x / d ^ n * d ^ n + x % d ^ n [ZMOD d ^ (n + 1)] := by
+    rw [add_comm (x % d ^ n), Int.pow_succ']
     exact Int.ModEq.add_right _ (Int.ModEq.mul_right' (Int.mod_modEq _ _))
   rw [Int.modEq_iff_add_fac] at hmodeq
   rcases hmodeq with ⟨t, hmodeq⟩
@@ -223,9 +265,9 @@ theorem badicI_rank_add_biInter_badicSet_eq (I : BadicType) {b : ℕ} (hb : 0 < 
   case succ k' IH =>
     rw [Set.biInter_lt_succ', Set.inter_comm (badicSet I b (n + _) _)]
     conv_lhs => arg 2; arg 1; arg 1; ext i; arg 1; ext h; arg 3; rw [(by omega : n + (i + 1:ℕ) = n + 1 + i)]
-    conv_lhs => arg 2; arg 1; arg 1; ext i; arg 1; ext h; arg 4; rw [← Int.ediv_ediv_pow_eq_ediv_pow_add_one _ (by positivity)]
+    conv_lhs => arg 2; arg 1; arg 1; ext i; arg 1; ext h; arg 4; rw [← Int.ediv_pow_add_one_eq_left _ (by positivity)]
     rw [(by omega : n + (k' + 1:ℕ) = n + 1 + k'),
-      (by rw [Int.ediv_ediv_pow_eq_ediv_pow_add_one _ (by positivity)] : t / b ^ (k' + 1) = t / b / b ^ k'),
+      (by rw [Int.ediv_pow_add_one_eq_left _ (by positivity)] : t / b ^ (k' + 1) = t / b / b ^ k'),
       ← Set.inter_assoc,
       IH (n + 1) (t / b),
       pow_zero,
